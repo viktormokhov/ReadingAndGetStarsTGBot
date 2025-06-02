@@ -1,6 +1,6 @@
 from aiogram.client.session import aiohttp
 
-from config.settings import ai_settings
+from config.settings import get_gemini_settings
 
 
 async def _get_gemini_response(url, prompt):
@@ -25,12 +25,14 @@ async def _get_gemini_response(url, prompt):
 
 async def get_google_gemini_text_response(model, prompt):
     """Получает ответ от текстовой модели Google Gemini."""
-    compose_url = f"{ai_settings.gemini.google_gemini_proxy_url}{model}?key={ai_settings.gemini.google_gemini_api_key.get_secret_value()}"
+    ai_settings = get_gemini_settings()
+
+    compose_url = f"{ai_settings.google_gemini_proxy_url}{model}?key={ai_settings.google_gemini_api_key}"
     return await _get_gemini_response(compose_url, prompt)
 
 
 # TODO Imagen model need pay
-async def get_google_gemini_vision_image_response(prompt):
-    """Получает ответ от визуальной (vision/image) модели Google Gemini."""
-    url = f"{ai_settings.google_gemini_proxy_url}{ai_settings.gemini_image_model}"
-    return await _get_gemini_response(url, prompt), ai_settings.gemini_image_model
+# async def get_google_gemini_vision_image_response(prompt):
+#     """Получает ответ от визуальной (vision/image) модели Google Gemini."""
+#     url = f"{ai_settings.google_gemini_proxy_url}{ai_settings.gemini_image_model}"
+#     return await _get_gemini_response(url, prompt), ai_settings.gemini_image_model

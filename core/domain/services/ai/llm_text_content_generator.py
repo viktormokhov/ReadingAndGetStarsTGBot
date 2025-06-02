@@ -1,10 +1,10 @@
 import random
 from typing import Optional, Any
 
+from config.settings import get_ai_settings
 from core.domain.services.ai.llm_providers import LLM_TEXT_PROVIDERS
 from core.domain.services.ai.prompt.prompt_builder import build_prompt
 from core.infrastructure.clients.ai.utils.normalize_and_validate import validate_generated_data
-from config.settings import ai_settings
 from config.constants import MAX_RETRIES
 from core.domain.services.ai.decorators.handle_text_errors import handle_text_errors
 from core.infrastructure.storage.history_service import remember_text
@@ -30,6 +30,7 @@ class LLMTextContentGenerator:
         self.uid = uid
         self.theme = theme
         self.age = age
+        self.ai_settings = get_ai_settings()
 
     def _build_prompt(self, category) -> str:
         """Формирует промпт для LLM на основе категории, темы и возраста пользователя."""
@@ -63,7 +64,7 @@ class LLMTextContentGenerator:
         Оборачивает вызов в обработчик ошибок с ретраями.
         """
         prompt = self._build_prompt(category)
-        models = list(ai_settings.get_all_text_models().items())
+        models = list(self.ai_settings.get_all_text_models().items())
         # Присвоим веса: по умолчанию 1, для openrouter — 0.2 (или 1/5)
         weights = [0.2 if name == "deepseek" else 1 for name, _ in models]
         provider_name, params = random.choices(models, weights=weights, k=1)[0]

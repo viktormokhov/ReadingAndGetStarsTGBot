@@ -1,5 +1,7 @@
 from datetime import datetime, UTC, date
-from sqlalchemy import Date, Boolean, JSON
+from typing import Optional
+
+from sqlalchemy import Date, Boolean, JSON, Text
 from sqlalchemy import ForeignKey, UniqueConstraint, String, Integer, Column, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
 
@@ -24,7 +26,7 @@ class UserCards(Base):
     theme: Mapped[str]
     title: Mapped[str]
     url: Mapped[str]
-    owner: Mapped["User"] = relationship(back_populates="cards")
+    # owner: Mapped["User"] = relationship(back_populates="cards")
     __table_args__ = (UniqueConstraint("user_id", "theme", "title"),)
 
 
@@ -50,21 +52,24 @@ class UserQuizzes(Base):
 
 class User(Base):
     __tablename__ = "users"
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str | None]
     age: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    is_approved: Mapped[bool] = mapped_column(default=False)
-    has_requested_access = Column(Boolean, default=False)
+    # is_approved: Mapped[bool] = mapped_column(default=False)
+    # has_requested_access = Column(Boolean, default=False)
     is_admin: Mapped[bool] = mapped_column(default=False)
-    q_ok: Mapped[int] = mapped_column(default=0)
-    q_tot: Mapped[int] = mapped_column(default=0)
-    streak: Mapped[int] = mapped_column(default=0)
-    last: Mapped[date | None] = mapped_column(Date, nullable=True)
-    cards: Mapped[list["UserCards"]] = relationship(back_populates="owner", cascade="all,delete")
+    avatar: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    # q_ok: Mapped[int] = mapped_column(default=0)
+    # q_tot: Mapped[int] = mapped_column(default=0)
+    # streak: Mapped[int] = mapped_column(default=0)
+    # last: Mapped[date | None] = mapped_column(Date, nullable=True)
+    # cards: Mapped[list["UserCards"]] = relationship(back_populates="owner", cascade="all,delete")
     quizzes: Mapped[list["UserQuizzes"]] = relationship(back_populates="user", cascade="all,delete")
     stars: Mapped[list["UserStars"]] = relationship(back_populates="user", cascade="all,delete")
-    first_active = Column(DateTime, default=lambda: datetime.now(UTC))
-    last_active = Column(DateTime, default=lambda: datetime.now(UTC))
+    status: Mapped[str] = mapped_column(String, default="pending", nullable=False)
+    telegram_id: Mapped[int] = mapped_column(unique=True)
+    first_active = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
+    last_active = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
 
 
 class ThemeSetting(Base):

@@ -1,6 +1,7 @@
 import random
 from typing import List
 
+from aiogram import types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
@@ -77,9 +78,9 @@ def back_kb() -> InlineKeyboardMarkup:
 
 def main_menu_inline_kb(is_admin: bool = False):
     kb = InlineKeyboardBuilder()
-    kb.button(text="📚 Чтение", callback_data="reading")
-    kb.button(text="📋 Квиз", web_app=WebAppInfo(url=WEBAPP_URL))
-    kb.button(text="👤 Профиль", callback_data="profile")
+    # kb.button(text="📚 Чтение", callback_data="reading")
+    kb.button(text="📋 Читайка", web_app=WebAppInfo(url=WEBAPP_URL))
+    # kb.button(text="👤 Профиль", callback_data="profile")
     # kb.button(text="🃏 Карточки", callback_data="cards")
     # kb.button(text="  📊 Статистика  ", callback_data="stats")
     # kb.button(text="💸 Баланс", callback_data="withdrawal")
@@ -89,3 +90,22 @@ def main_menu_inline_kb(is_admin: bool = False):
         kb.button(text="🛠️ Admin Panel", callback_data="admin")
     kb.adjust(1)
     return kb.as_markup(row_width=1)
+
+def get_start_keyboard(is_admin: bool = False) -> types.InlineKeyboardMarkup:
+    keyboard = []
+
+    # Кнопка WebApp
+    webapp_button = types.InlineKeyboardButton(
+        text="Читайка",
+        web_app=types.WebAppInfo(url=WEBAPP_URL)
+    )
+    keyboard.append([webapp_button])
+
+    if is_admin:
+        admin_button = types.InlineKeyboardButton(
+            text="🛠️ Admin Panel",
+            callback_data="admin"
+        )
+        keyboard.append([admin_button])
+
+    return types.InlineKeyboardMarkup(inline_keyboard=keyboard)

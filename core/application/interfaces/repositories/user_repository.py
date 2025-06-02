@@ -20,6 +20,14 @@ class UserRepositoryInterface(ABC):
         pass
 
     @abstractmethod
+    async def save_user(self, user: User):
+        pass
+
+    @abstractmethod
+    async def update_user_status(self, user_id: int, status: str):
+        pass
+
+    @abstractmethod
     async def get_all(self) -> Optional[list[User]]:
         pass
 
@@ -50,6 +58,8 @@ class UserRepositoryInterface(ABC):
     @abstractmethod
     async def get_generated_count_today_by_user(self, user_id: int, theme: str) -> int:
         pass
+
+
 
 
 

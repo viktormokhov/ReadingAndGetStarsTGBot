@@ -1,10 +1,12 @@
 from openai import AsyncOpenAI
 
-from config.settings import ai_settings
+from config.settings import get_deepseek_settings
+
+ai_settings = get_deepseek_settings()
 
 client_openrouter_ai = AsyncOpenAI(
-    base_url=ai_settings.deepseek.openrouter_url,
-    api_key=ai_settings.deepseek.openrouter_api_key.get_secret_value()
+    base_url=ai_settings.openrouter_url,
+    api_key=ai_settings.openrouter_api_key
 )
 
 

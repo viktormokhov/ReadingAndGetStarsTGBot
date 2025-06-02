@@ -34,16 +34,19 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
             raise RuntimeError("Session is not initialized")
         return self._session
 
-    async def get_by_id(self, uid: int) -> Optional[User]:
-        user = await self.session.get(UserORM, uid)
+    async def get_by_id(self, telegram_id: int) -> Optional[User]:
+        q = select(UserORM).where(UserORM.telegram_id == telegram_id)
+        res = await self.session.execute(q)
+        user = res.scalar_one_or_none()
         if user is None:
             return None
         return self._map_to_domain(user)
 
-    async def create(self, uid: int, name: str = None, is_admin: bool = False, is_approved: bool = False) -> User:
-        """Создаёт нового пользователя с указанным ID."""
-        user = UserORM(id=uid, name=name, is_admin=is_admin, is_approved=is_approved)
+    async def create(self, uid: int, name: str = None, is_admin: bool = False, status: str = 'pending') -> User:
+        """Создаёт нового пользователя с указанным Telegram ID."""
+        user = UserORM(telegram_id=uid, name=name, is_admin=is_admin, status=status)
         self.session.add(user)
+        await self.session.flush()
         return self._map_to_domain(user)
 
     async def get_or_create(self, uid: int, name: str | None = None) -> Optional[User]:
@@ -51,6 +54,12 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
         if not user:
             user = await self.create(uid, name)
         return self._map_to_domain(user)
+
+    async def save_user(self, user: User):
+        pass
+
+    async def update_user_status(self, user_id: int, status: str):
+        pass
 
     async def get_all(self) -> Optional[list[User]]:
         result = await self.session.execute(select(UserORM))
@@ -104,13 +113,14 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
             id=user_orm.id,
             name=user_orm.name,
             age=user_orm.age,
-            is_approved=user_orm.is_approved,
-            has_requested_access=user_orm.has_requested_access,
             is_admin=user_orm.is_admin,
-            q_ok=user_orm.q_ok,
-            q_tot=user_orm.q_tot,
-            streak=user_orm.streak,
-            last=user_orm.last,
+            status=user_orm.status,
+            # has_requested_access=user_orm.has_requested_access,
+            # q_ok=user_orm.q_ok,
+            # q_tot=user_orm.q_tot,
+            # streak=user_orm.streak,
+            # last=user_orm.last,
+            telegram_id=user_orm.telegram_id,
             first_active=user_orm.first_active,
             last_active=user_orm.last_active
         )

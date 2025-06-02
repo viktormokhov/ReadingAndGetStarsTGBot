@@ -3,7 +3,7 @@ from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMar
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from fastapi import Depends
 
-from config.settings import tg_settings
+from config.settings import get_tg_settings
 from core.infrastructure.database import user_ops
 from core.infrastructure.database.models import User
 from core.application.security.admin_only import admin_only
@@ -22,6 +22,7 @@ async def request_access_callback(call: CallbackQuery):
     Обрабатывает нажатие на кнопку "Запросить доступ".
     Ставит флаг has_requested_access = True для пользователя.
     """
+    tg_settings = get_tg_settings()
     uid = call.from_user.id
     async with SQLAlchemyUserRepository() as repo:
         user = await repo.get_by_id(uid)
@@ -45,7 +46,7 @@ async def request_access_callback(call: CallbackQuery):
     kb = builder.as_markup(row_width=2)
 
     # Рассылаем уведомление админам
-    for admin_id in tg_settings.tg_admin_ids:
+    for admin_id in tg_settings.tg_admin_id:
         await call.bot.send_message(
             chat_id=admin_id,
             text=f"🔔 Запрос доступа от {user.name} (ID: {uid})",
@@ -97,7 +98,7 @@ async def approve_user(call: CallbackQuery, is_admin: bool):
     user_id = int(call.data.split(":", 1)[1])
 
     async with SQLAlchemyUserRepository() as repo:
-        user = repo.get_by_id(user_id)
+        user = await repo.get_by_id(user_id)
 
     if not user:
         await call.answer("❌ Пользователь не найден", show_alert=True)

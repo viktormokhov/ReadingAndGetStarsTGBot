@@ -1,15 +1,17 @@
 import aiohttp
 
-from config.settings import ai_settings
+from config.settings import get_cloudflare_settings
 
 
 async def get_cloudflare_worker_image_response(model, prompt):
     """
     Выполняет асинхронный POST-запрос к Cloudflare Workers AI для генерации изображения.
     """
-    url = f'{ai_settings.cloudflare.cloudflare_worker_image_url}'
+    ai_settings = get_cloudflare_settings()
+
+    url = f'{ai_settings.cloudflare_worker_image_url}'
     headers = {
-        'Authorization': f'Bearer {ai_settings.cloudflare.cloudflare_api_key.get_secret_value()}',
+        'Authorization': f'Bearer {ai_settings.cloudflare_api_key}',
         'Content-Type': 'application/json'
     }
     payload = {

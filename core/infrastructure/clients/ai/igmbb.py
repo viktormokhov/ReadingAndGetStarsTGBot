@@ -2,14 +2,15 @@ import base64
 
 from aiogram.client.session import aiohttp
 
-from config.settings import imgbb_settings
+from config.settings import get_imgbb_settings
 
+imgbb_settings = get_imgbb_settings()
 
 async def upload_to_imgbb(raw):
     image_base64 = base64.b64encode(raw).decode('utf-8')
     url = "https://api.imgbb.com/1/upload"
     payload = {
-        "key": imgbb_settings.imgbb_api_key.get_secret_value(),
+        "key": imgbb_settings.imgbb_api_key,
         "image": image_base64
     }
     async with aiohttp.ClientSession() as session:

@@ -40,7 +40,7 @@ This project is a Telegram bot designed to help users practice reading skills th
 
 4. Create a `.env` file in the root directory with the following variables:
    ```
-   TG_ADMIN_IDS=your_telegram_id
+   TG_ADMIN_ID=your_telegram_id
    TG_BOT_TOKEN=your_telegram_bot_token
    OPENAI_API_KEY=your_openai_api_key
    GOOGLE_GEMINI_API_KEY=your_google_gemini_api_key

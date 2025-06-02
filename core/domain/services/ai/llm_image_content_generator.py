@@ -4,9 +4,9 @@ from typing import Any
 
 from aiogram.types import InputMediaPhoto
 
+from config.settings import get_ai_settings
 from core.domain.services.ai.llm_providers import LLM_IMAGE_PROVIDERS
 from core.domain.services.ai.prompt.prompt import CARD_PROMPT
-from config.settings import ai_settings
 from config.constants import MAX_RETRIES
 from config.content import IMAGE_FORMATS, IMAGE_STYLES
 from core.domain.services.ai.decorators.handle_image_errors import handle_image_errors
@@ -33,6 +33,7 @@ class LLMImageContentGenerator:
         self.uid = uid
         self.theme = theme
         self.age = age
+        self.ai_settings = get_ai_settings()
 
     def _build_prompt(self, title: str, age: int) -> str:
         """Формирует промпт для генерации изображения."""
@@ -63,7 +64,7 @@ class LLMImageContentGenerator:
         Возвращает кортеж (url, model).
         """
         prompt = self._build_prompt(title, self.age)
-        provider_name, params = random.choice(list(ai_settings.get_all_image_models().items()))
+        provider_name, params = random.choice(list(self.ai_settings.get_all_image_models().items()))
         provider = LLM_IMAGE_PROVIDERS[provider_name]
         response = await provider['get_response'](params['image']['model_name'], prompt)
         return response[0], response[1]

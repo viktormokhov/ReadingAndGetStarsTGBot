@@ -1,20 +1,19 @@
 from pathlib import Path
 from typing import Optional
+from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
-from pydantic import Field, SecretStr, field_validator, BaseModel
+from pydantic import Field, SecretStr, BaseModel
 from pydantic_settings import BaseSettings
-
-load_dotenv()
 
 # Базовая директория проекта
 BASE_DIR = Path(__file__).resolve().parent.parent
 ENV_FILE = BASE_DIR / ".env"
-DATA_DIR = BASE_DIR / "data"
-CARD_DIR = DATA_DIR / "card"
-DATA_DIR.mkdir(exist_ok=True)
+
+load_dotenv(dotenv_path=ENV_FILE)
 
 WEBAPP_URL = "https://v0-quiz-dx.vercel.app"
+
 
 class ProjectBaseSettings(BaseSettings):
     class Config:
@@ -26,21 +25,24 @@ class ProjectBaseSettings(BaseSettings):
 class TextModelConfig(BaseModel):
     model_name: str
 
+
 class ImageModelConfig(BaseModel):
     model_name: str
 
 
 class TelegramSettings(ProjectBaseSettings):
-    tg_admin_ids: list[int]
+    tg_admin_id: int
     tg_bot_token: SecretStr
+    tg_webhook_url: str
+    tg_webhook_token: SecretStr
 
-    @field_validator("tg_admin_ids", mode="before")
-    def parse_admin_ids(cls, v):
-        if isinstance(v, int):
-            return [v]
-        if isinstance(v, str):
-            return [int(uid.strip()) for uid in v.split(",") if uid.strip()]
-        return v
+    @property
+    def bot_token(self) -> str:
+        return self.tg_bot_token.get_secret_value()
+
+    @property
+    def webhook_token(self) -> str:
+        return self.tg_webhook_token.get_secret_value()
 
 
 class OpenAISettings(ProjectBaseSettings):
@@ -48,12 +50,20 @@ class OpenAISettings(ProjectBaseSettings):
     text: Optional[TextModelConfig] = TextModelConfig(model_name="gpt-4.1-nano-2025-04-14")
     image: Optional[ImageModelConfig] = ImageModelConfig(model_name="dall-e-3")
 
+    @property
+    def api_key(self) -> str:
+        return self.openai_api_key.get_secret_value()
+
 
 class GeminiSettings(ProjectBaseSettings):
     google_gemini_api_key: SecretStr
     google_gemini_proxy_url: str
     text: Optional[TextModelConfig] = TextModelConfig(model_name="gemini-2.0-flash-001:generateContent")
     image: Optional[ImageModelConfig] = None
+
+    @property
+    def api_key(self) -> str:
+        return self.google_gemini_api_key.get_secret_value()
 
 
 class CloudflareSettings(ProjectBaseSettings):
@@ -69,12 +79,20 @@ class CloudflareSettings(ProjectBaseSettings):
             f'{self.cloudflare_account_id}/ai/run/@cf/{self.image.model_name}'
         )
 
+    @property
+    def api_key(self) -> str:
+        return self.cloudflare_api_key.get_secret_value()
+
 
 class DeepSeekSettings(ProjectBaseSettings):
     openrouter_api_key: SecretStr
     openrouter_url: str = 'https://openrouter.ai/api/v1'
     text: Optional[TextModelConfig] = TextModelConfig(model_name="deepseek/deepseek-r1:free")
     image: Optional[ImageModelConfig] = None
+
+    @property
+    def api_key(self) -> str:
+        return self.openrouter_api_key.get_secret_value()
 
 
 class AISettings:
@@ -104,9 +122,27 @@ class AISettings:
 
 
 class DBSettings(ProjectBaseSettings):
-    db_url: str = Field(default_factory=lambda: f"sqlite+aiosqlite:///{DATA_DIR / 'bot.database'}")
+    postgres_user: str
+    postgres_secret: SecretStr
+    postgres_host: str = Field("127.0.0.1")
+    postgres_port: int = Field(5432)
+    postgres_db_name: str
+
+    @property
+    def db_url(self) -> str:
+        password = quote_plus(self.postgres_secret.get_secret_value())
+        return (
+            f"postgresql+asyncpg://{self.postgres_user}:{password}@"
+            f"{self.postgres_host}:{self.postgres_port}/{self.postgres_db_name}"
+        )
+
+    @property
+    def secret(self) -> str:
+        return self.postgres_secret.get_secret_value()
+
     mongodb_uri: str = "mongodb://localhost:27017"
     mongodb_name: str = "telegram_bot"
+
 
 class ImgBBSettings(ProjectBaseSettings):
     imgbb_api_key: SecretStr
@@ -115,20 +151,48 @@ class ImgBBSettings(ProjectBaseSettings):
 class BackendSettings(ProjectBaseSettings):
     backend_api_key: SecretStr
 
+    @property
+    def api_key(self) -> str:
+        return self.backend_api_key.get_secret_value()
+
+
 # === Инициализация ===
-tg_settings = TelegramSettings()
-openai_settings = OpenAISettings()
-gemini_settings = GeminiSettings()
-cloudflare_settings = CloudflareSettings()
-deepseek_settings = DeepSeekSettings()
+def get_tg_settings():
+    return TelegramSettings()
 
-ai_settings = AISettings(
-    openai=openai_settings,
-    gemini=gemini_settings,
-    cloudflare=cloudflare_settings,
-    deepseek=deepseek_settings,
-)
 
-db_settings = DBSettings()
-imgbb_settings = ImgBBSettings()
-backend_settings = BackendSettings()
+def get_openai_settings():
+    return OpenAISettings()
+
+
+def get_gemini_settings():
+    return GeminiSettings()
+
+
+def get_cloudflare_settings():
+    return CloudflareSettings()
+
+
+def get_deepseek_settings():
+    return DeepSeekSettings()
+
+
+def get_ai_settings():
+    return AISettings(
+        openai=get_openai_settings(),
+        gemini=get_gemini_settings(),
+        cloudflare=get_cloudflare_settings(),
+        deepseek=get_deepseek_settings(),
+    )
+
+
+def get_db_settings():
+    return DBSettings()
+
+
+def get_imgbb_settings():
+    return ImgBBSettings()
+
+
+def get_backend_settings():
+    return BackendSettings()

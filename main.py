@@ -1,57 +1,30 @@
-import asyncio
 import logging
 from contextlib import asynccontextmanager
 
-from aiogram import Bot, Dispatcher
-from aiogram.client.bot import DefaultBotProperties
-from aiogram.enums import ParseMode
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from api.routers import health as health_router
-from api.routers import users as users_router
-from bot.handlers import start
-from bot.handlers.admin import restart_bot, admin_menu, requests, admin_general_stats, delete_redis_keys, users
-from bot.handlers.profile import profile_stats, profile_menu
-from bot.handlers.reading import reading_main, reading_menu
-from bot.handlers.users.cards import router as cards_router
-from bot.middleware.access import AdminMiddleware
-from bot.middleware.activity import LastActiveMiddleware
-from bot.middleware.admin_check import AdminCheckMiddleware
-from bot.middleware.command_block import CommandBlockerMiddleware
-from bot.middleware.user_check import UserCheckMiddleware
-from config.settings import tg_settings, db_settings
-from core.infrastructure.clients.redis_client import rc as redis_client
+from api.routers import user
+from config.settings import get_tg_settings, get_db_settings
+from core.application.commands.notify_service import notify_admin_after_restart
+from core.application.startup import ensure_webhook
 from core.infrastructure.clients.mongodb import init_mongo
+from core.infrastructure.clients.postgres import init_db
 from core.infrastructure.clients.redis_client import init_redis
-from core.infrastructure.clients.sqlalchemy import init_db
 from core.infrastructure.database.connection import sqlalchemy_engine
-from core.infrastructure.database.repository_factory import RepositoryFactory
+from core.presentation.routers.telegram_webhook import router as webhook_router
+from core.presentation.health.health_router import router as health_router
 
+# --- Логирование
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
 )
 
-
-async def notify_admin_after_restart(bot):
-    admin_id = await redis_client.get("restart_notify_admin_id")
-    if admin_id:
-        logging.info(f"admin_id из Redis: {admin_id!r}")
-        await bot.send_message(int(admin_id), "✅ Бот успешно перезагружен!")
-        await redis_client.delete("restart_notify_admin_id")
-
-
-async def on_startup(bot: Bot):
-    await notify_admin_after_restart(bot)
-    logging.info("✅ Бот запущен.")
-
-
-async def on_shutdown(dispatcher: Dispatcher, bot: Bot):
-    await bot.session.close()
-    await sqlalchemy_engine.dispose()
-    logging.info("🛑 Завершение. Сессии БД и бот закрыты.")
+# --- Глобальные настройки
+tg_settings = get_tg_settings()
+db_settings = get_db_settings()
 
 
 # --- FastAPI lifespan
@@ -59,7 +32,7 @@ async def on_shutdown(dispatcher: Dispatcher, bot: Bot):
 async def lifespan(app: FastAPI):
     logging.info("Lifespan started!")
 
-    # 1. Инициализация SQLAlchemy
+    # 1. Инициализация PostgreSQL+SQLAlchemy
     await init_db()
 
     # 2. Инициализация Redis
@@ -68,70 +41,28 @@ async def lifespan(app: FastAPI):
     # 3. Инициализация MongoDB
     mongo_client = await init_mongo(app, db_settings)
 
-    # Запускаем aiogram-бота как фоновую задачу
-    bot = Bot(
-        token=tg_settings.tg_bot_token.get_secret_value(),
-        default=DefaultBotProperties(parse_mode=ParseMode.HTML)
-    )
-    dp = Dispatcher()
-    dp.startup.register(on_startup)
-    dp["redis"] = redis_client
+    # 4. Проверка и установка Telegram webhook
+    await ensure_webhook()
 
-    # Middleware
-    dp.message.middleware(CommandBlockerMiddleware())
-    dp.message.middleware(LastActiveMiddleware())
-    dp.callback_query.middleware(LastActiveMiddleware())
-    dp.message.middleware(AdminCheckMiddleware())
-    dp.message.middleware(AdminMiddleware())
-    dp.callback_query.middleware(AdminCheckMiddleware())
-    dp.message.middleware(UserCheckMiddleware())
-    dp.callback_query.middleware(UserCheckMiddleware())
+    # 5. Уведомление администратора о перезагрузке
+    await notify_admin_after_restart()
 
-    # Routers
-    dp.include_router(start.router)
-    dp.include_router(admin_menu.router)
-    dp.include_router(requests.router)
-    dp.include_router(users.router)
-    dp.include_router(admin_general_stats.router)
-    dp.include_router(restart_bot.router)
-    dp.include_router(delete_redis_keys.router)
-    dp.include_router(reading_menu.router)
-    dp.include_router(reading_main.router)
-    dp.include_router(profile_menu.router)
-    dp.include_router(cards_router)
-    dp.include_router(profile_stats.router)
-
-
-    # stop_event = asyncio.Event()
-
-    async def polling():
-        logging.info("Starting aiogram polling...")
-        await notify_admin_after_restart(bot)
-        try:
-            await dp.start_polling(bot)
-        except Exception as e:
-            logging.exception("Polling task crashed!")
-
-    polling_task = asyncio.create_task(polling())
     yield
-    polling_task.cancel()
-    try:
-        await polling_task
-    except asyncio.CancelledError as e:
-        logging.warning(f"Polling cancelled: {e}")
-    await on_shutdown(dp, bot)
+
+    await sqlalchemy_engine.dispose()
     await mongo_client.close()
+    logging.info("🛑 Shutting down. Database sessions have been closed.")
 
 
-# app = FastAPI(lifespan=lifespan)
+# --- Инициализация FastAPI
 app = FastAPI(
     title="Telegram Reading Bot API",
     description="API for external calls to the Telegram Reading Bot",
-    version="1",
+    version="1.0.0",
     lifespan=lifespan
 )
 
-# Add CORS middleware
+# --- CORS middleware
 app.add_middleware(
     CORSMiddleware,
     # allow_origins=["http://localhost:8000",
@@ -145,5 +76,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(health_router.router)
-app.include_router(users_router.router)
+# --- Routers
+app.include_router(health_router)
+app.include_router(user.router)
+app.include_router(webhook_router)
+# app.include_router(users_router.router)

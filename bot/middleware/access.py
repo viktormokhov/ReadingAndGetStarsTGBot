@@ -33,4 +33,6 @@ class AdminMiddleware(BaseMiddleware):
     async def is_admin(self, user_id: int) -> bool:
         async with SQLAlchemyUserRepository() as repo:
             user = await repo.get_by_id(user_id)
+            if user is None:
+                return False
             return user.is_admin

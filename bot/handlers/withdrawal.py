@@ -1,7 +1,7 @@
 # from telegram import Update, ReplyKeyboardRemove
 # from telegram.ext import ContextTypes
 #
-# from bot.handlers.state import ensure_name
+# from bot.routers.state import ensure_name
 #
 #
 # async def cmd_withdrawal(update: Update, context: ContextTypes.DEFAULT_TYPE):

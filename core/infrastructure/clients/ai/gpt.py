@@ -2,9 +2,11 @@ from typing import Literal
 
 from openai import AsyncOpenAI
 
-from config.settings import ai_settings
+from config.settings import get_openai_settings
 
-client_open_ai = AsyncOpenAI(api_key=ai_settings.openai.openai_api_key.get_secret_value())
+
+ai_settings = get_openai_settings()
+client_open_ai = AsyncOpenAI(api_key=ai_settings.openai_api_key)
 
 
 async def get_openai_gpt_text_response(model, prompt):
