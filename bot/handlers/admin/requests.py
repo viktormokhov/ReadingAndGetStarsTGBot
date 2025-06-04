@@ -1,16 +1,12 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from fastapi import Depends
 
 from config.settings import get_tg_settings
-from core.infrastructure.database import user_ops
-from core.infrastructure.database.models import User
 from core.application.security.admin_only import admin_only
 from bot.handlers.ui.ui_main import main_menu_inline_kb
 from bot.handlers.ui.ui_admin import admin_back_menu_kb
 from core.infrastructure.database.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
-from core.infrastructure.database.repository_factory import RepositoryFactory
 
 router = Router()
 

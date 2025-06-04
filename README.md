@@ -14,11 +14,16 @@ This project is a Telegram bot designed to help users practice reading skills th
 ## Installation
 
 ### Prerequisites
-- Python 3.8 or higher
+- Python 3.12 or higher
+- PostgreSQL
 - MongoDB
+- Redis
 - Telegram Bot Token
 - OpenAI API Key
-- Google Gemini API Key (optional)
+- Google Gemini API Key
+- Cloudflare API Key (for image generation)
+- OpenRouter API Key (for DeepSeek models)
+- ImgBB API Key (for image hosting)
 
 ### Steps
 1. Clone the repository:
@@ -27,49 +32,88 @@ This project is a Telegram bot designed to help users practice reading skills th
    cd telegram-reading-bot
    ```
 
-2. Create a virtual environment and activate it:
+2. Install Poetry (if not already installed):
    ```
-   python -m venv .venv
-   .venv\Scripts\activate
+   curl -sSL https://install.python-poetry.org | python3 -
+   ```
+
+   Or on Windows:
+   ```
+   (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
    ```
 
 3. Install the required dependencies:
    ```
-   pip install -r requirements.txt
+   poetry install
    ```
 
-4. Create a `.env` file in the root directory with the following variables:
+4. Activate the Poetry virtual environment:
    ```
+   poetry shell
+   ```
+
+5. Create a `.env` file in the root directory with the following variables:
+   ```
+   # Telegram Configuration
    TG_ADMIN_ID=your_telegram_id
    TG_BOT_TOKEN=your_telegram_bot_token
+   TG_WEBHOOK_URL=https://your-domain.com:8443/api/v1/telegram/telegram-webhook
+   TG_WEBHOOK_TOKEN=your_webhook_token
+
+   # AI Service API Keys
    OPENAI_API_KEY=your_openai_api_key
    GOOGLE_GEMINI_API_KEY=your_google_gemini_api_key
-   MONGODB_URI=mongodb://localhost:27017
-   MONGODB_DB_NAME=telegram_bot
-   BACKEND_URL=https://your-backend-url.com
-   BACKEND_API_KEY=your_api_key_here
+   GOOGLE_GEMINI_PROXY_URL=https://your-proxy-url/v1/models/
+   CLOUDFLARE_API_KEY=your_cloudflare_api_key
+   CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
+   OPENROUTER_API_KEY=your_openrouter_api_key
+   HUGGINGFACE_API_KEY=your_huggingface_api_key
+   GROK_API_KEY=your_grok_api_key
+   IMGBB_API_KEY=your_imgbb_api_key
 
-   # API Server Configuration
-   API_SERVER_HOST=0.0.0.0
-   API_SERVER_PORT=8000
-   # API_SERVER_SSL_CERT=path/to/cert.pem
-   # API_SERVER_SSL_KEY=path/to/key.pem
+   # Database Configuration
+   POSTGRES_USER=your_postgres_user
+   POSTGRES_PASSWORD=your_postgres_password
+   POSTGRES_DB=your_postgres_db
+   # MongoDB is configured in settings.py with default values:
+   # mongodb_uri=mongodb://localhost:27017
+   # mongodb_name=telegram_bot
+
+   # Backend Communication
+   BACKEND_URL=https://your-backend-url.com/api
+   BACKEND_API_KEY=your_backend_api_key
    ```
 
-5. Run the bot:
+6. Run the bot:
    ```
+   # Using Poetry
+   poetry run python main.py
+
+   # Or if you're already in the Poetry shell
    python main.py
    ```
 
+   This will start both the Telegram bot and the FastAPI server.
+
 ## Configuration
-The bot's behavior can be configured through the `core/config.py` file:
+The bot's behavior can be configured through the `config/` directory:
 
-- `DAILY_LIMIT_PER_THEME`: Maximum number of questions per theme per day (default: 5)
-- `CARDS_PER_PAGE`: Number of cards displayed per page (default: 4)
-- `MAX_ATTEMPTS`: Maximum number of wrong attempts allowed per quiz (default: 3)
-- `MAX_RETRY`: Maximum number of retries for API calls (default: 4)
+### Main Settings (`config/settings.py`)
+This file contains the configuration for:
+- Telegram bot settings
+- AI service providers (OpenAI, Google Gemini, Cloudflare, DeepSeek)
+- Database connections (PostgreSQL, MongoDB)
+- Backend communication
 
-The file also contains definitions for:
+### Constants (`config/constants.py`)
+This file contains various constants used throughout the application:
+- `DAILY_LIMIT_PER_THEME`: Maximum number of questions per theme per day
+- `CARDS_PER_PAGE`: Number of cards displayed per page
+- `MAX_ATTEMPTS`: Maximum number of wrong attempts allowed per quiz
+- `MAX_RETRY`: Maximum number of retries for API calls
+
+### Content (`config/content.py`)
+This file contains definitions for:
 - Reading topics organized by categories
 - Badge system with different achievement levels
 - Badge labels for different tiers
@@ -101,35 +145,58 @@ The file also contains definitions for:
 ## Architecture
 
 ### Main Components
-- **main.py**: Entry point, sets up the bot, middleware, and routers
-- **core/**: Core functionality
-  - **config.py**: Configuration constants and tables
-  - **database/**: Database initialization and models
-  - **services/**: Business logic services
+- **main.py**: Entry point, sets up the FastAPI application, database connections, and routers
+- **config/**: Configuration files
+  - **settings.py**: Environment variables and settings
+  - **constants.py**: Application constants
+  - **content.py**: Content definitions (topics, badges, etc.)
+- **core/**: Core functionality using a clean architecture approach
+  - **domain/**: Domain models and interfaces
+    - **models/**: Domain entities (User, State, etc.)
+    - **interfaces/**: Abstract interfaces
+    - **services/**: Domain-specific services
+  - **application/**: Application services and use cases
+    - **commands/**: Command handlers
+    - **services/**: Application services
+    - **interfaces/**: Repository interfaces
+    - **security/**: Security-related functionality
+  - **infrastructure/**: External services and data access
+    - **clients/**: External API clients (MongoDB, PostgreSQL, Redis, AI services)
+    - **database/**: Database models and repositories
+    - **storage/**: Storage services
+    - **telegram/**: Telegram client implementation
+  - **presentation/**: API endpoints and controllers
+    - **health/**: Health check endpoints
+    - **telegram/**: Telegram webhook handling
+    - **user/**: User-related endpoints
+- **bot/**: Telegram bot functionality
+  - **handlers/**: Message and callback handlers
+    - **admin/**: Admin panel handlers
+    - **reading/**: Reading session handlers
+    - **profile/**: User profile handlers
+    - **users/**: User-related handlers
   - **middleware/**: Request processing middleware
-  - **ai/**: AI integration for text generation
-  - **ui.py**: User interface components
-- **handlers/**: Telegram message and callback handlers
-  - **admin/**: Admin panel handlers
-  - **reading/**: Reading session handlers
-  - **cards.py**: Card collection handlers
-  - **users/**: User-related handlers
-- **api/**: FastAPI application for external calls
-  - **app.py**: Main FastAPI application
-  - **server.py**: Server configuration and startup
+  - **services/**: Bot-specific services
+  - **utils/**: Utility functions
+- **api/**: Additional API endpoints
   - **routers/**: API endpoint routers
     - **reading.py**: Reading-related endpoints
-    - **users.py**: User-related endpoints
+    - **user.py**: User-related endpoints
+    - **users.py**: User management endpoints
 
 ### Database
-The bot uses both SQLite (via SQLAlchemy) and MongoDB:
-- SQLite: User data, progress, and statistics
+The bot uses PostgreSQL (via SQLAlchemy), MongoDB, and Redis:
+- PostgreSQL: User data, progress, and statistics
 - MongoDB: Generated texts, questions, and cards
+- Redis: Caching, session data, and rate limiting
 
 ### AI Integration
-The bot uses AI services to generate texts and questions:
-- OpenAI API for text generation
-- Google Gemini API (optional) for additional AI capabilities
+The bot uses multiple AI services to generate texts, questions, and images:
+- OpenAI API for text generation (GPT models) and image generation (DALL-E)
+- Google Gemini API for text generation
+- Cloudflare AI for image generation (Stable Diffusion XL)
+- DeepSeek models via OpenRouter API for text generation
+- ImgBB API for image hosting
 
 ## API for External Calls
 
@@ -250,7 +317,7 @@ The API can communicate with an external backend server using the configured BAC
 
 2. Use the backend client in your code:
    ```python
-   from api.clients import backend_client
+   from api import backend_client
 
    # Make a GET request to the backend
    data = await backend_client.get("endpoint/path")
@@ -269,14 +336,22 @@ The API can communicate with an external backend server using the configured BAC
 
 To configure the bot to start automatically when your Windows system boots up, follow these steps:
 
-### Using the Batch Script
+### Creating a Startup Script
 
-1. A batch script `start_bot.bat` is included in the repository. This script:
+1. Create a batch script `start_bot.bat` in the repository root with the following content:
+   ```batch
+   @echo off
+   cd /d %~dp0
+   call poetry run python main.py
+   pause
+   ```
+
+2. This script:
    - Changes to the bot's directory
-   - Activates the virtual environment (if needed)
-   - Starts the bot
+   - Runs the bot using Poetry
+   - Pauses to keep the window open if there are errors
 
-2. You can run this script manually to start the bot:
+3. You can run this script manually to start the bot:
    ```
    .\start_bot.bat
    ```
@@ -307,4 +382,4 @@ For more advanced configuration:
 - API access is for external calls only
 
 ## License
-[Include license information here]
+This project is licensed under the terms of the license agreement provided with the source code. Please contact the repository owner for more information about licensing terms and conditions.

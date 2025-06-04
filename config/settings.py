@@ -123,22 +123,22 @@ class AISettings:
 
 class DBSettings(ProjectBaseSettings):
     postgres_user: str
-    postgres_secret: SecretStr
-    postgres_host: str = Field("127.0.0.1")
+    postgres_password: SecretStr
+    postgres_host: str = Field("postgres")
     postgres_port: int = Field(5432)
-    postgres_db_name: str
+    postgres_db: str
 
     @property
     def db_url(self) -> str:
-        password = quote_plus(self.postgres_secret.get_secret_value())
+        password = quote_plus(self.postgres_password.get_secret_value())
         return (
             f"postgresql+asyncpg://{self.postgres_user}:{password}@"
-            f"{self.postgres_host}:{self.postgres_port}/{self.postgres_db_name}"
+            f"{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
 
     @property
     def secret(self) -> str:
-        return self.postgres_secret.get_secret_value()
+        return self.postgres_password.get_secret_value()
 
     mongodb_uri: str = "mongodb://localhost:27017"
     mongodb_name: str = "telegram_bot"

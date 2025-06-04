@@ -1,13 +1,10 @@
 import logging
-from typing import Any, Optional
 
 from aiogram.types import CallbackQuery
 from pydantic import ValidationError
 
-from core.domain.services.ai.llm_image_content_generator import LLMImageContentGenerator
 from core.infrastructure import save_card, is_card_duplicate
 from core.infrastructure import get_user_age
-from core.application.decorators.block import async_with_generating_flag
 from core.infrastructure import AsyncSessionLocal
 
 

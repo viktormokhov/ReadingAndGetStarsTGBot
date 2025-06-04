@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 from datetime import datetime, UTC
-from typing import Optional, Callable
+from typing import Optional
 
 from sqlalchemy import select, delete, func
 from sqlalchemy.ext.asyncio import AsyncSession

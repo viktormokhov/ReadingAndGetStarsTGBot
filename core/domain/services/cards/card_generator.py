@@ -2,7 +2,6 @@ import logging
 from typing import Any, Optional
 
 from aiogram.types import CallbackQuery
-from pydantic import ValidationError
 
 from core.domain.services.ai.llm_image_content_generator import LLMImageContentGenerator
 from core.application.decorators.block import async_with_generating_flag

@@ -1,7 +1,6 @@
-import logging
 from datetime import datetime
 
-from config.settings import get_tg_settings, WEBAPP_URL
+from config.settings import get_tg_settings
 from core.domain.models.user import UserResponse
 
 

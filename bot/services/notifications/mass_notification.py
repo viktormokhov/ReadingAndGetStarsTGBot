@@ -1,7 +1,7 @@
 import asyncio
 from telegram import Bot
-from bot.core.config import TOKEN
-from bot.core.database import session, user_ops
+from bot import TOKEN
+from bot import session, user_ops
 
 bot = Bot(token=TOKEN)
 

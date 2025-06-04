@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 async def create_database_if_not_exists(db_settings: DBSettings):
     try:
+        db_name = db_settings.postgres_db
         conn = await asyncpg.connect(
             user=db_settings.postgres_user,
             password=db_settings.secret,
@@ -19,7 +20,6 @@ async def create_database_if_not_exists(db_settings: DBSettings):
             port=db_settings.postgres_port,
             database='postgres',
         )
-        db_name = db_settings.postgres_db_name
         exists = await conn.fetchval("SELECT 1 FROM pg_database WHERE datname = $1", db_name)
         if not exists:
             await conn.execute(f'CREATE DATABASE "{db_name}"')
