@@ -2,15 +2,13 @@ from datetime import datetime
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Depends
 
-from core.presentation.deps import verify_webhook_api_key
-from config.settings import get_tg_settings
 from core.application.commands.process_start_command import process_start_command
 # from api.routers.user import moderate_user
 # from config.settings import tg_settings, WEBAPP_URL
 from core.domain.models.telegram import TelegramWebhook
 from core.domain.models.user import ModerationRequest
-from core.infrastructure.telegram.telegram_client import TelegramClient
-
+from core.infrastructure.telegram.telegram_client import TelegramClient, get_tg_client
+from core.presentation.deps import verify_webhook_api_key
 
 router = APIRouter(
     prefix="/api/v1/telegram",
@@ -22,11 +20,9 @@ router = APIRouter(
 
 @router.post("/telegram-webhook")
 async def telegram_webhook(webhook: TelegramWebhook,
-                           background_tasks: BackgroundTasks):
+                           background_tasks: BackgroundTasks,
+                           tg_client: TelegramClient = Depends(get_tg_client)):
     """Обработка webhook от Telegram"""
-    tg_settings = get_tg_settings()
-    tg_client = TelegramClient(tg_settings.bot_token)
-
     user_id = webhook.message["chat"]["id"]
 
     try:
@@ -72,7 +68,7 @@ async def telegram_webhook(webhook: TelegramWebhook,
         elif webhook.message:
             text = webhook.message.get("text", "")
             if text and text.startswith("/start"):
-                await process_start_command(user_id, tg_client)
+                background_tasks.add_task(process_start_command, user_id, tg_client)
 
         return {"success": True}
 

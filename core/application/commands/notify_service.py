@@ -44,9 +44,8 @@ async def notify_admin_about_registration(user: UserResponse, birth_date: str):
     )
 
 
-async def notify_admin_after_restart():
+async def notify_admin_after_restart(tg_client):
     tg_settings = get_tg_settings()
-    tg_client = TelegramClient(tg_settings.bot_token)
     admin_id = tg_settings.tg_admin_id
     try:
         response = await tg_client.send_message(

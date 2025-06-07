@@ -124,8 +124,8 @@ class AISettings:
 class DBSettings(ProjectBaseSettings):
     postgres_user: str
     postgres_password: SecretStr
-    postgres_host: str = Field("postgres")
-    postgres_port: int = Field(5432)
+    postgres_host: str
+    postgres_port: int
     postgres_db: str
 
     @property
@@ -139,9 +139,24 @@ class DBSettings(ProjectBaseSettings):
     @property
     def secret(self) -> str:
         return self.postgres_password.get_secret_value()
+    mongo_initdb_root_username: str
+    mongo_initdb_root_password: SecretStr
+    mongodb_host: str
+    mongodb_port: int
+    mongodb_name: str
 
-    mongodb_uri: str = "mongodb://localhost:27017"
-    mongodb_name: str = "telegram_bot"
+    @property
+    def mongodb_url(self) -> str:
+        password = quote_plus(self.mongo_initdb_root_password.get_secret_value())
+        return (
+            f"mongodb://{self.mongo_initdb_root_username}:{password}@"
+            f"{self.mongodb_host}:{self.mongodb_port}/{self.mongodb_name}"
+            "?authSource=admin"
+        )
+
+    @property
+    def mongodb_secret(self) -> str:
+        return self.mongo_initdb_root_password.get_secret_value()
 
 
 class ImgBBSettings(ProjectBaseSettings):

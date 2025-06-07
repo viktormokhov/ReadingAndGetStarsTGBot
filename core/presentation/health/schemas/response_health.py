@@ -2,6 +2,9 @@ from pydantic import BaseModel
 from typing import Optional, Dict, Any, List
 
 
+class HealthCheckResponse(BaseModel):
+    status: str
+
 class MongoHealthResponse(BaseModel):
     mongo: str
     status: str
@@ -53,6 +56,12 @@ class MemoryStatus(BaseModel):
 class CPUStatus(BaseModel):
     usage_percent: float
 
+class ProcessInfo(BaseModel):
+    cpu_percent: float
+    mem_mb: float
+    name: str
+    pid: int
+
 class HealthStatusResponse(BaseModel):
     status: str
     app_uptime_seconds: int
@@ -62,3 +71,5 @@ class HealthStatusResponse(BaseModel):
     disk: DiskStatus
     memory: MemoryStatus
     cpu: CPUStatus
+    hostname: str
+    top_processes : list[ProcessInfo]
