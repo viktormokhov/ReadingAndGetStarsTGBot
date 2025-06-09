@@ -2,11 +2,11 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from src.bot.handlers.ui.ui_main import categories_kb, topics_kb, main_menu_inline_kb
-from src.bot.utils.guards import block_if_pending_callback
-from src.core.application.decorators.block import block_if_active_question
-from src.core.application.security.approved_user_only import is_approved_user
-from src.core.infrastructure.database.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
+from bot.handlers.ui.ui_main import categories_kb, topics_kb, main_menu_inline_kb
+from bot.utils.guards import block_if_pending_callback
+from core.application.decorators.block import block_if_active_question
+from core.application.security.approved_user_only import is_approved_user
+from core.infrastructure.db.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
 
 router = Router()
 

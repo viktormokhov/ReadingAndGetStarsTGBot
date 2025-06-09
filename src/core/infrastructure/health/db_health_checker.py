@@ -3,8 +3,8 @@ from typing import Any
 
 from sqlalchemy import text
 
-from src.core.application.interfaces.health_providers import DBHealthChecker
-from src.core.infrastructure.database.connection import sqlalchemy_engine
+from core.application.interfaces.health_providers import DBHealthChecker
+from core.infrastructure.db.connection import sqlalchemy_engine
 
 
 class DefaultDBHealthChecker(DBHealthChecker):

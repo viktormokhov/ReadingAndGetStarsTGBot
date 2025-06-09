@@ -2,11 +2,11 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from src.config.content import build_display
-from src.core.infrastructure.database import themes
-from src.core.application.security.approved_user_only import is_approved_user
-from src.bot.services.cards.card_presentation import send_card_page
-from src.bot.handlers.ui.ui_cards import card_filter_paged_kb
+from config.content import build_display
+from core.infrastructure.db import themes
+from core.application.security.approved_user_only import is_approved_user
+from bot.services.cards.card_presentation import send_card_page
+from bot.handlers.ui.ui_cards import card_filter_paged_kb
 
 router = Router()
 

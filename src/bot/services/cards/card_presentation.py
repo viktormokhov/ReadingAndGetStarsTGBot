@@ -1,7 +1,7 @@
 from aiogram.types import CallbackQuery, InputMediaPhoto
 
-from src.config.constants import CARDS_PER_PAGE
-from src.bot.handlers.ui.ui_cards import cards_pagination_kb
+from config.constants import CARDS_PER_PAGE
+from bot.handlers.ui.ui_cards import cards_pagination_kb
 
 
 async def send_card_page(query: CallbackQuery, cards: list, page: int):

@@ -2,7 +2,7 @@
 # from telegram.ext import ContextTypes, CommandHandler, ConversationHandler, CallbackQueryHandler
 #
 # from core import ui
-# from core.database import session, user_ops
+# from core.db import session, user_ops
 # from core.ai.entry import get_question_from_openai
 #
 # TEST_ANSWER = 0

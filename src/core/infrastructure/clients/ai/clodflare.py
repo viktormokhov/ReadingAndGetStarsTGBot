@@ -1,6 +1,6 @@
 import aiohttp
 
-from src.config.settings import get_cloudflare_settings
+from config.settings import get_cloudflare_settings
 
 
 async def get_cloudflare_worker_image_response(model, prompt):

@@ -3,7 +3,7 @@ from typing import Callable, Any
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 
-from src.core.infrastructure.database.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
+from core.infrastructure.db.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
 
 
 def is_approved_user():

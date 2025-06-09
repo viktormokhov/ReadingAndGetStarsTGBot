@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from src.config.constants import CARDS_PER_PAGE, CARDS_ROW_WIDTH
+from config.constants import CARDS_PER_PAGE, CARDS_ROW_WIDTH
 
 
 def card_filter_kb(themes: list[str]) -> InlineKeyboardMarkup:

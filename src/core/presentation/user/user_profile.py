@@ -5,7 +5,7 @@ from config.settings import get_openai_settings, get_minio_settings
 from core.application.services.avatar_service import AvatarService
 from core.domain.models.user import UserProfileResponse
 from core.infrastructure.ai.openai_image_generator import OpenAIImageGenerator
-from core.infrastructure.database.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
+from core.infrastructure.db.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
 from core.infrastructure.image_tools import ImageTools
 from core.infrastructure.storage.minio_storage import MinioImageStorage
 from core.presentation.user.schemas.user_schema import GenerateAvatarResponse, GenerateAvatarRequest

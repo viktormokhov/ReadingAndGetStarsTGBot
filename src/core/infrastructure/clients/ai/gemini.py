@@ -1,6 +1,6 @@
 from aiogram.client.session import aiohttp
 
-from src.config.settings import get_gemini_settings
+from config.settings import get_gemini_settings
 
 
 async def _get_gemini_response(url, prompt):

@@ -5,8 +5,8 @@ import logging
 import httpx
 import openai
 
-from src.config.constants import MAX_RETRIES, BACKOFF_BASE_SECONDS
-from src.core.infrastructure.clients.redis_client import rc as redis_client
+from config.constants import MAX_RETRIES, BACKOFF_BASE_SECONDS
+from core.infrastructure.clients.redis_client import rc as redis_client
 
 logger = logging.getLogger(__name__)
 

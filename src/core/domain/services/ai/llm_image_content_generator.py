@@ -4,13 +4,13 @@ from typing import Any
 
 from aiogram.types import InputMediaPhoto
 
-from src.config.settings import get_ai_settings
-from src.core.domain.services.ai.llm_providers import LLM_IMAGE_PROVIDERS
-from src.core.domain.services.ai.prompt.prompt import CARD_PROMPT
-from src.config.constants import MAX_RETRIES
-from src.config.content import IMAGE_FORMATS, IMAGE_STYLES
-from src.core.domain.services.ai.decorators.handle_image_errors import handle_image_errors
-from src.core.infrastructure.clients.ai.igmbb import upload_to_imgbb
+from config.settings import get_ai_settings
+from core.domain.services.ai.llm_providers import LLM_IMAGE_PROVIDERS
+from core.domain.services.ai.prompt.prompt import CARD_PROMPT
+from config.constants import MAX_RETRIES
+from config.content import IMAGE_FORMATS, IMAGE_STYLES
+from core.domain.services.ai.decorators.handle_image_errors import handle_image_errors
+from core.infrastructure.clients.ai.igmbb import upload_to_imgbb
 
 logger = logging.getLogger(__name__)
 
@@ -29,11 +29,20 @@ class LLMImageContentGenerator:
         age (int): Возраст пользователя (может влиять на генерацию).
     """
 
-    def __init__(self, uid: int, theme: str, age: int):
+    def __init__(self, uid: int, theme: str, birthdate: date):
         self.uid = uid
         self.theme = theme
-        self.age = age
+        self.birthdate = birthdate
         self.ai_settings = get_ai_settings()
+
+    @property
+    def age(self) -> int:
+        """Calculate age from birthdate"""
+        today = date.today()
+        age = today.year - self.birthdate.year
+        if (today.month, today.day) < (self.birthdate.month, self.birthdate.day):
+            age -= 1
+        return age
 
     def _build_prompt(self, title: str, age: int) -> str:
         """Формирует промпт для генерации изображения."""

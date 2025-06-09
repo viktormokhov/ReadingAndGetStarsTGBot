@@ -1,9 +1,9 @@
 from typing import Any
 
-from src.config.content import BADGES
-from src.core.infrastructure.database.connection import AsyncSessionLocal
-from src.core.infrastructure.database.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
-from src.core.infrastructure.database.user_ops import update_user_accuracy
+from config.content import BADGES
+from core.infrastructure.db.connection import AsyncSessionLocal
+from core.infrastructure.db.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
+from core.infrastructure.db.user_ops import update_user_accuracy
 
 
 async def accuracy(uid: int, correct: bool):

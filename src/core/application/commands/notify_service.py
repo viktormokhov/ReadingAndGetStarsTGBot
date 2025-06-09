@@ -6,16 +6,20 @@ from core.domain.models.user import UserResponse
 
 
 async def notify_admin_about_registration(user: UserResponse, birth_date: str):
+    from core.utils.date_utils import calculate_age
+
     tg_settings = get_tg_settings()
     bot_token = tg_settings.tg_bot_token
     admin_id = tg_settings.tg_admin_id
 
     birth_date_formatted = datetime.strptime(birth_date, "%Y-%m-%d").strftime("%d.%m.%Y")
+    age = calculate_age(birth_date)
+
     text = (
         f"🆕 <b>Новая регистрация!</b>\n\n"
         f"👤 <b>Имя:</b> {user.name}\n"
         f"🆔 <b>Telegram ID:</b> {user.telegram_id}\n"
-        f"🎂 <b>Возраст:</b> {user.age} лет\n"
+        f"🎂 <b>Возраст:</b> {age} лет\n"
         f"📅 <b>Дата рождения:</b> {birth_date_formatted}\n"
         f"🎨 <b>Аватар:</b> {user.avatar}\n\n"
         f"⏰ <b>Время регистрации:</b> {datetime.now().strftime('%d.%m.%Y %H:%M')}\n\n"

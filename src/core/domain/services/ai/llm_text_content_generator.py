@@ -1,13 +1,14 @@
 import random
+from datetime import date
 from typing import Optional, Any
 
-from src.config.settings import get_ai_settings
-from src.core.domain.services.ai.llm_providers import LLM_TEXT_PROVIDERS
-from src.core.domain.services.ai.prompt.prompt_builder import build_prompt
-from src.core.infrastructure.clients.ai.utils.normalize_and_validate import validate_generated_data
-from src.config.constants import MAX_RETRIES
-from src.core.domain.services.ai.decorators.handle_text_errors import handle_text_errors
-from src.core.infrastructure.storage.history_service import remember_text
+from config.settings import get_ai_settings
+from core.domain.services.ai.llm_providers import LLM_TEXT_PROVIDERS
+from core.domain.services.ai.prompt.prompt_builder import build_prompt
+from core.infrastructure.clients.ai.utils.normalize_and_validate import validate_generated_data
+from config.constants import MAX_RETRIES
+from core.domain.services.ai.decorators.handle_text_errors import handle_text_errors
+from core.infrastructure.storage.history_service import remember_text
 
 ResultType = dict[str, Any]
 
@@ -26,11 +27,20 @@ class LLMTextContentGenerator:
         age (int): Возраст пользователя для персонализации контента.
     """
 
-    def __init__(self, uid: int, theme: str, age: int):
+    def __init__(self, uid: int, theme: str, birthdate: date):
         self.uid = uid
         self.theme = theme
-        self.age = age
+        self.birthdate = birthdate
         self.ai_settings = get_ai_settings()
+
+    @property
+    def age(self) -> int:
+        """Calculate age from birthdate"""
+        today = date.today()
+        age = today.year - self.birthdate.year
+        if (today.month, today.day) < (self.birthdate.month, self.birthdate.day):
+            age -= 1
+        return age
 
     def _build_prompt(self, category) -> str:
         """Формирует промпт для LLM на основе категории, темы и возраста пользователя."""

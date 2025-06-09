@@ -3,7 +3,7 @@ from typing import Optional
 
 from sqlalchemy import select
 
-from src.core.domain.models.user import User
+from core.domain.models.user import User
 
 
 class UserRepositoryInterface(ABC):

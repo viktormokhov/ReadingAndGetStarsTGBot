@@ -7,18 +7,18 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from fastapi import Depends
 
-from src.bot.handlers.ui.ui_main import reading, topics_kb, categories_kb
-from src.config.constants import ACTIVE_QUESTION_KEY, MAX_ATTEMPTS
-from src.config.content import CATEGORIES
-from src.core.application.decorators.block import async_with_generating_flag
-from src.core.application.security.approved_user_only import is_approved_user
-from src.core.application.services.users.user_flags import delete_blocking_message
-from src.core.domain.services.reading.reading_result import save_card_and_notify
-from src.core.domain.services.reading.reading_service import prepare_next_question, prepare_first_question, \
+from bot.handlers.ui.ui_main import reading, topics_kb, categories_kb
+from config.constants import ACTIVE_QUESTION_KEY, MAX_ATTEMPTS
+from config.content import CATEGORIES
+from core.application.decorators.block import async_with_generating_flag
+from core.application.security.approved_user_only import is_approved_user
+from core.application.services.users.user_flags import delete_blocking_message
+from core.domain.services.reading.reading_result import save_card_and_notify
+from core.domain.services.reading.reading_service import prepare_next_question, prepare_first_question, \
     has_exceeded_daily_limit
-from src.core.domain.services.users.user_progress import accuracy
-from src.core.infrastructure.clients.redis_client import rc as redis_client
-from src.core.infrastructure.database.repository_factory import RepositoryFactory
+from core.domain.services.users.user_progress import accuracy
+from core.infrastructure.clients.redis_client import rc as redis_client
+from core.infrastructure.db.repository_factory import RepositoryFactory
 
 router = Router()
 

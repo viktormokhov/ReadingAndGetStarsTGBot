@@ -2,10 +2,10 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict, Any
 
-from src.core.domain.services.ai.llm_text_content_generator import LLMTextContentGenerator
-from src.core.infrastructure.database.connection import AsyncSessionLocal
-from src.core.infrastructure.database import text_log
-from src.config.constants import DAILY_LIMIT_PER_THEME
+from core.domain.services.ai.llm_text_content_generator import LLMTextContentGenerator
+from core.infrastructure.db.connection import AsyncSessionLocal
+from core.infrastructure.db import text_log
+from config.constants import DAILY_LIMIT_PER_THEME
 
 router = APIRouter(
     prefix="/reading",

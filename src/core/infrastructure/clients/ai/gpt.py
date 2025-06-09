@@ -2,7 +2,7 @@ from typing import Literal
 
 from openai import AsyncOpenAI
 
-from src.config.settings import get_openai_settings
+from config.settings import get_openai_settings
 
 
 ai_settings = get_openai_settings()

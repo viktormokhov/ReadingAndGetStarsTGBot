@@ -2,12 +2,12 @@ from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 
-from src.config.settings import get_tg_settings
-from src.core.domain.models.user import RegistrationRequest, UserResponse
+from config.settings import get_tg_settings
+from core.domain.models.user import RegistrationRequest, UserResponse
 # from services.user_service import UserService
 # from repository.user_repo import UserRepository
 
-from src.core.utils.telegram_utils import notify_admin_about_registration
+from core.utils.telegram_utils import notify_admin_about_registration
 
 router = APIRouter(
     prefix="/api/v1/user",
@@ -43,8 +43,8 @@ async def register_user(
         user_data = {
             "telegram_id": request.telegram_id,
             "name": request.name,
-            "age": age,
-            "birth_date": request.birth_date,
+            "birthdate": datetime.strptime(request.birth_date, "%Y-%m-%d").date(),
+            "gender": request.gender,
             "avatar": request.avatar,
             "stars": 0,
             "total_questions": 0,
@@ -59,7 +59,8 @@ async def register_user(
         user_response = UserResponse(
             id=request.telegram_id,  # В реальности это будет ID из БД
             name=request.name,
-            age=age,
+            birthdate=datetime.strptime(request.birth_date, "%Y-%m-%d").date(),
+            gender=request.gender,
             telegram_id=request.telegram_id,
             avatar=request.avatar,
             status="pending"
@@ -111,5 +112,3 @@ async def register_user(
 #         return {"success": True, "data": user.dict()}
 #     except Exception as e:
 #         raise HTTPException(status_code=404, detail=str(e))
-
-

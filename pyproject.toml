@@ -33,6 +33,7 @@ psutil = ">=7.0.0"
 minio = ">=7.2.15"
 pillow = ">=11.2.1"
 aioredis = ">=2.0.1"
+psycopg2-binary = "^2.9.10"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.4.3"

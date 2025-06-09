@@ -1,8 +1,8 @@
-from src.core.application.interfaces.repositories.user_repository import UserRepositoryInterface
+from core.application.interfaces.repositories.user_repository import UserRepositoryInterface
 # from core.application.interfaces.repositories.card_repository import CardRepositoryInterface
 
-from src.core.infrastructure.database.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
-# from core.infrastructure.database.repositories.sqlalchemy_card_repository import SQLAlchemyCardRepository
+from core.infrastructure.db.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
+# from core.infrastructure.db.repositories.sqlalchemy_card_repository import SQLAlchemyCardRepository
 
 
 class RepositoryFactory:

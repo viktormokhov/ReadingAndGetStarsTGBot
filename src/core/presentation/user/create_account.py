@@ -1,10 +1,11 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, BackgroundTasks, HTTPException
 
 from config.settings import get_tg_settings
-from core.domain.models.user import RegistrationRequest
+from core.domain.models.user import RegistrationRequest, UserResponse
 from core.domain.services.telegram.telegram_validation_service import validate_telegram_webapp_data
-from core.domain.services.users.user_service import calculate_age
 from core.presentation.deps import verify_api_key
+from core.utils.telegram_utils import notify_admin_about_registration
 
 router = APIRouter(
     prefix="/api/v1/user",
@@ -13,7 +14,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-@router.post("/create_account", response_model=dict)
+@router.post("/create-account", response_model=dict)
 async def register_user(
         request: RegistrationRequest,
         background_tasks: BackgroundTasks
@@ -33,13 +34,13 @@ async def register_user(
             print(f"✅ Telegram данные валидны для пользователя: {request.telegram_id}")
 
         # Вычисляем возраст
-        age = calculate_age(request.birth_date)
 
         # Создаем данные пользователя
         user_data = {
             "telegram_id": request.telegram_id,
             "name": request.name,
             "age": age,
+            "gender": request.gender,
             "birth_date": request.birth_date,
             "avatar": request.avatar,
             "stars": 0,
@@ -56,6 +57,7 @@ async def register_user(
             id=request.telegram_id,  # В реальности это будет ID из БД
             name=request.name,
             age=age,
+            gender=request.gender,
             telegram_id=request.telegram_id,
             avatar=request.avatar,
             status="pending"

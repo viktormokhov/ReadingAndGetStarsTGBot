@@ -1,8 +1,8 @@
 from aiogram import BaseMiddleware
 from aiogram.types import Message
 
-from src.config.constants import KIND_TO_MESSAGE, BLOCK_MSG_KEY
-from src.core.application.services.users.user_flags import get_generating_status
+from config.constants import KIND_TO_MESSAGE, BLOCK_MSG_KEY
+from core.application.services.users.user_flags import get_generating_status
 
 
 class CommandBlockerMiddleware(BaseMiddleware):

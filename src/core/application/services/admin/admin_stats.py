@@ -1,8 +1,8 @@
 from sqlalchemy import func, select
 
-from src.core.domain.models.stats import GeneralStats
-from src.core.domain.services.users.user_progress import get_status_by_stars
-from src.core.infrastructure.database.models import UserStars, User
+from core.domain.models.stats import GeneralStats
+from core.domain.services.users.user_progress import get_status_by_stars
+from core.infrastructure.db.models import UserStars, User
 
 
 async def get_general_stats(user_repo) -> GeneralStats:

@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine, AsyncEngine
 
-from src.config.settings import get_db_settings
+from config.settings import get_db_settings
 
 db_settings = get_db_settings()
 

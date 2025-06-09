@@ -3,10 +3,10 @@ from typing import Union
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, Message
 
-from src.core.application.security.approved_user_only import is_approved_user
-from src.bot.services.formatting.user_formatter import format_stats
-from src.core.domain.services.users.user_progress import user_summary
-from src.bot.handlers.ui.ui_profile import profile_back_kb
+from core.application.security.approved_user_only import is_approved_user
+from bot.services.formatting.user_formatter import format_stats
+from core.domain.services.users.user_progress import user_summary
+from bot.handlers.ui.ui_profile import profile_back_kb
 
 router = Router()
 

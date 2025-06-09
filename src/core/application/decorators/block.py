@@ -1,7 +1,7 @@
 import functools
 from aiogram.types import Message
 
-from src.config.constants import KIND_TO_MESSAGE
+from config.constants import KIND_TO_MESSAGE
 
 
 def async_with_generating_flag(get_user_id, kind):
@@ -18,7 +18,7 @@ def async_with_generating_flag(get_user_id, kind):
             if dispatcher is None:
                 raise ValueError("dispatcher должен быть передан как keyword argument (dispatcher=...)")
             user_id = get_user_id(*args, **kwargs)
-            from src.core.application.services.users.user_flags import set_generating, clear_generating
+            from core.application.services.users.user_flags import set_generating, clear_generating
 
             await set_generating(dispatcher["redis"], user_id, kind=kind)
             try:
@@ -44,7 +44,7 @@ def block_if_active_question(get_user_id):
 
             # Получаем user_id через функцию (например, lambda message, ...: message.from_user.id)
             user_id = get_user_id(*args, **kwargs)
-            from src.core.application.services.users.user_flags import has_active_question
+            from core.application.services.users.user_flags import has_active_question
 
             if await has_active_question(redis, user_id):
                 # Находим message/CallbackQuery

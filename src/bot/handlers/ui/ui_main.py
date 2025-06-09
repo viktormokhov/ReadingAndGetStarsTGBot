@@ -5,8 +5,8 @@ from aiogram import types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from src.config.settings import WEBAPP_URL
-from src.config.content import CATEGORIES, build_display
+from config.settings import WEBAPP_URL
+from config.content import CATEGORIES, build_display
 
 
 # === Базовые утилиты ===

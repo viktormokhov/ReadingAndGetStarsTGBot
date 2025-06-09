@@ -3,11 +3,11 @@ import asyncio
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from src.bot.handlers.ui.ui_main import reading
-from src.config.constants import DAILY_LIMIT_PER_THEME
-from src.core.domain.models.state import ReadingState
-from src.core.domain.services.ai.llm_text_content_generator import LLMTextContentGenerator
-from src.core.infrastructure.database.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
+from bot.handlers.ui.ui_main import reading
+from config.constants import DAILY_LIMIT_PER_THEME
+from core.domain.models.state import ReadingState
+from core.domain.services.ai.llm_text_content_generator import LLMTextContentGenerator
+from core.infrastructure.db.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
 
 
 async def has_exceeded_daily_limit(uid: int, theme: str) -> bool:

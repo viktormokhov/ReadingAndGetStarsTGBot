@@ -1,8 +1,8 @@
 # from aiogram import BaseMiddleware
 # from aiogram.types import TelegramObject
 # from typing import Callable, Awaitable, Dict, Any
-# from core.database.session import Session
-# from core.database.models import User
+# from core.db.session import Session
+# from core.db.models import User
 #
 #
 # class LoadUserMiddleware(BaseMiddleware):

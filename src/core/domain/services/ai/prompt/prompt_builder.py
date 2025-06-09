@@ -4,8 +4,8 @@ import time
 import emoji
 import math
 
-from src.core.domain.services.ai.prompt.mapping import CATEGORIES_PROMPT
-from src.core.domain.services.ai.prompt.prompt import SCHOOL_PROMPT, READING_PROMPT
+from core.domain.services.ai.prompt.mapping import CATEGORIES_PROMPT
+from core.domain.services.ai.prompt.prompt import SCHOOL_PROMPT, READING_PROMPT
 
 
 def get_length_by_age(age: int) -> int:

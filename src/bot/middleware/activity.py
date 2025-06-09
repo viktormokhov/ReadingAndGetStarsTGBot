@@ -4,8 +4,8 @@ from typing import Callable, Dict, Any, Awaitable
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
-from src.core.infrastructure.database.connection import AsyncSessionLocal
-from src.core.infrastructure.database.models import User
+from core.infrastructure.db.connection import AsyncSessionLocal
+from core.infrastructure.db.models import User
 
 
 class LastActiveMiddleware(BaseMiddleware):

@@ -54,7 +54,8 @@ class User(Base):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str | None]
-    age: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    birthdate: Mapped[date] = mapped_column(Date, nullable=False)
+    gender: Mapped[str] = mapped_column(String, nullable=False)
     # is_approved: Mapped[bool] = mapped_column(default=False)
     # has_requested_access = Column(Boolean, default=False)
     is_admin: Mapped[bool] = mapped_column(default=False)

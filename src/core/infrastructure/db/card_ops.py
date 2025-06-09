@@ -3,7 +3,7 @@ import logging
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.infrastructure.database.models import UserCards
+from core.infrastructure.db.models import UserCards
 
 logger = logging.getLogger(__name__)
 

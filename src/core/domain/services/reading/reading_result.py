@@ -4,11 +4,11 @@ import random
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from src.config.constants import MAX_ATTEMPTS
-from src.core.domain.models.state import ReadingState
-from src.core.domain.services.cards.card_generator import process_card_generation
-from src.core.infrastructure.database import themes
-from src.bot.handlers.ui.ui_main import categories_kb
+from config.constants import MAX_ATTEMPTS
+from core.domain.models.state import ReadingState
+from core.domain.services.cards.card_generator import process_card_generation
+from core.infrastructure.db import themes
+from bot.handlers.ui.ui_main import categories_kb
 
 logger = logging.getLogger(__name__)
 

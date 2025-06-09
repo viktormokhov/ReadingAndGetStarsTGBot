@@ -1,8 +1,8 @@
 from typing import List, Tuple
 
-from src.core.domain.models.pagination import PageParams
-from src.core.domain.models.stats import UserStat
-from src.core.infrastructure.database.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
+from core.domain.models.pagination import PageParams
+from core.domain.models.stats import UserStat
+from core.infrastructure.db.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
 
 
 async def fetch_user_stats(page_params: PageParams) -> Tuple[List[UserStat], int]:

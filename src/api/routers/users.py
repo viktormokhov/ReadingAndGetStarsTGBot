@@ -5,11 +5,11 @@
 # from pydantic import BaseModel
 # from sqlalchemy import select
 # from api.service.quiz_stats import calculate_user_stats
-# from core.infrastructure.database.connection import AsyncSessionLocal
+# from core.infrastructure.db.connection import AsyncSessionLocal
 #
 # from core.application.models.api.quiz import UserQuizCreate, UserQuizResponse, UserStarsResponse
-# from core.infrastructure.database.models import UserQuizzes
-# from core.infrastructure.database.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
+# from core.infrastructure.db.models import UserQuizzes
+# from core.infrastructure.db.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
 #
 # router = APIRouter(
 #     prefix="/api/v1/users",

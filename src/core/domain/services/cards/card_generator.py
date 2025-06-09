@@ -3,8 +3,8 @@ from typing import Any, Optional
 
 from aiogram.types import CallbackQuery
 
-from src.core.domain.services.ai.llm_image_content_generator import LLMImageContentGenerator
-from src.core.application.decorators.block import async_with_generating_flag
+from core.domain.services.ai.llm_image_content_generator import LLMImageContentGenerator
+from core.application.decorators.block import async_with_generating_flag
 
 @async_with_generating_flag(lambda call, qs, logger, dispatcher: qs.uid, kind="card")
 async def process_card_generation(

@@ -6,6 +6,8 @@ from core.domain.models.user import UserResponse
 
 async def notify_admin_about_registration(user: UserResponse, birth_date: str):
     """Уведомление администратора о новой регистрации"""
+    from core.utils.date_utils import calculate_age
+
     tg_settings = get_tg_settings()
     try:
         bot_token = tg_settings.tg_bot_token
@@ -18,13 +20,16 @@ async def notify_admin_about_registration(user: UserResponse, birth_date: str):
         # Форматируем дату рождения
         birth_date_formatted = datetime.strptime(birth_date, "%Y-%m-%d").strftime("%d.%m.%Y")
 
+        # Вычисляем возраст
+        age = calculate_age(birth_date)
+
         # Создаем текст уведомления
         text = f"""
         🆕 <b>Новая регистрация!</b>
 
         👤 <b>Имя:</b> {user.name}
         🆔 <b>Telegram ID:</b> {user.telegram_id}
-        🎂 <b>Возраст:</b> {user.age} лет
+        🎂 <b>Возраст:</b> {age} лет
         📅 <b>Дата рождения:</b> {birth_date_formatted}
         🎨 <b>Аватар:</b> {user.avatar}
 
@@ -58,4 +63,3 @@ async def notify_admin_about_registration(user: UserResponse, birth_date: str):
 
     except Exception as e:
         print(f"Ошибка отправки уведомления администратору: {e}")
-

@@ -5,8 +5,8 @@ from typing import Optional
 from sqlalchemy import select, delete, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.infrastructure.database.connection import AsyncSessionLocal
-from src.core.infrastructure.database.models import User, ThemeStat, UserCards, UserStars, UserQuizzes
+from core.infrastructure.db.connection import AsyncSessionLocal
+from core.infrastructure.db.models import User, ThemeStat, UserCards, UserStars, UserQuizzes
 
 
 
@@ -80,11 +80,34 @@ class UserService:
 #     return user
 
 
-async def update_user_age(user_id: int, age: int):
+async def update_user_birthdate(user_id: int, birthdate: date):
+    """
+    Updates a user's birthdate in the database.
+
+    Args:
+        user_id (int): The user's ID.
+        birthdate (date): The user's birthdate.
+    """
     async with AsyncSessionLocal.begin() as session:
         user = await session.get(User, user_id)
-        user.age = age
+        user.birthdate = birthdate
         await session.commit()
+
+async def update_user_age(user_id: int, age: int):
+    """
+    Legacy function that updates a user's birthdate based on age.
+    Approximates birthdate as January 1st of the calculated birth year.
+
+    Args:
+        user_id (int): The user's ID.
+        age (int): The user's age.
+    """
+    # Calculate approximate birthdate from age
+    current_year = datetime.now().year
+    birth_year = current_year - age
+    birthdate = date(birth_year, 1, 1)
+
+    await update_user_birthdate(user_id, birthdate)
 
 
 async def get_all_user_ids(session: AsyncSession) -> list[int]:
@@ -101,19 +124,40 @@ async def get_all_user_ids(session: AsyncSession) -> list[int]:
     return [row[0] for row in result.all()]
 
 
-async def get_user_age(uid: int, session: AsyncSession) -> Optional[int]:
+async def get_user_birthdate(uid: int, session: AsyncSession) -> Optional[date]:
     """
-    Получает возраст пользователя.
+    Получает дату рождения пользователя.
 
     Args:
         uid (int): Идентификатор пользователя.
         session (AsyncSession): Асинхронная сессия SQLAlchemy.
 
     Returns:
-        Optional[int]: Возраст пользователя или None, если пользователь не найден.
+        Optional[date]: Дата рождения пользователя или None, если пользователь не найден.
     """
     user = await session.get(User, uid)
-    return user.age if user else None
+    return user.birthdate if user else None
+
+async def get_user_age(uid: int, session: AsyncSession) -> Optional[int]:
+    """
+    Получает возраст пользователя, рассчитанный на основе даты рождения.
+
+    Args:
+        uid (int): Идентификатор пользователя.
+        session (AsyncSession): Асинхронная сессия SQLAlchemy.
+
+    Returns:
+        Optional[int]: Возраст пользователя или None, если пользователь не найден или дата рождения не указана.
+    """
+    user = await session.get(User, uid)
+    if not user or not user.birthdate:
+        return None
+
+    today = date.today()
+    age = today.year - user.birthdate.year
+    if (today.month, today.day) < (user.birthdate.month, user.birthdate.day):
+        age -= 1
+    return age
 
 
 # def select_users_where(predicate: Callable[[User], object]) -> select:
@@ -165,7 +209,15 @@ async def update_user_accuracy(uid: int, correct: bool, session: AsyncSession):
     correct (bool): Был ли ответ верным.
     session (AsyncSession): Асинхронная сессия SQLAlchemy.
     """
-    user = await get_or_create_user(uid)
+    # Get user from session directly
+    user = await session.get(User, uid)
+    if user is None:
+        # Create a new user with default birthdate if not found
+        from datetime import date
+        default_birthdate = date(2000, 1, 1)
+        user = User(id=uid, birthdate=default_birthdate)
+        session.add(user)
+
     user.q_tot = (user.q_tot or 0) + 1
     user.q_ok = (user.q_ok or 0) + int(correct)
     await session.commit()
@@ -261,7 +313,14 @@ async def update_streak(uid: int, session: AsyncSession) -> int:
     Returns:
         int: Бонус за продолжение streak (5 или 0).
     """
-    user = await get_or_create_user(uid)
+    # Get user from session directly
+    user = await session.get(User, uid)
+    if user is None:
+        # Create a new user with default birthdate if not found
+        default_birthdate = date(2000, 1, 1)
+        user = User(id=uid, birthdate=default_birthdate)
+        session.add(user)
+
     today = date.today()
     # Если streak уже сегодня обновлялся — возвращаем 0
     if user.last == today:

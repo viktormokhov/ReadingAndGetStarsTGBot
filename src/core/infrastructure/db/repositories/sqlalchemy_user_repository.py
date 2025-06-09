@@ -4,10 +4,10 @@ from typing import Optional, List, Callable
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.application.interfaces.repositories.user_repository import UserRepositoryInterface
-from src.core.domain.models.user import User
-from src.core.infrastructure.database.connection import AsyncSessionLocal
-from src.core.infrastructure.database.models import User as UserORM, ThemeStat, UserCards, UserStars, TextGeneration
+from core.application.interfaces.repositories.user_repository import UserRepositoryInterface
+from core.domain.models.user import User
+from core.infrastructure.db.connection import AsyncSessionLocal
+from core.infrastructure.db.models import User as UserORM, ThemeStat, UserCards, UserStars, TextGeneration
 
 
 class SQLAlchemyUserRepository(UserRepositoryInterface):
@@ -42,17 +42,20 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
             return None
         return self._map_to_domain(user)
 
-    async def create(self, uid: int, name: str = None, is_admin: bool = False, status: str = 'pending') -> User:
+    async def create(self, uid: int, name: str = None, birthdate: date = None, is_admin: bool = False, status: str = 'pending') -> User:
         """Создаёт нового пользователя с указанным Telegram ID."""
-        user = UserORM(telegram_id=uid, name=name, is_admin=is_admin, status=status)
+        if birthdate is None:
+            # Default birthdate if none provided (January 1, 2000)
+            birthdate = date(2000, 1, 1)
+        user = UserORM(telegram_id=uid, name=name, birthdate=birthdate, is_admin=is_admin, status=status)
         self.session.add(user)
         await self.session.flush()
         return self._map_to_domain(user)
 
-    async def get_or_create(self, uid: int, name: str | None = None) -> Optional[User]:
+    async def get_or_create(self, uid: int, name: str | None = None, birthdate: date = None) -> Optional[User]:
         user = await self.session.get(UserORM, uid)
         if not user:
-            user = await self.create(uid, name)
+            user = await self.create(uid, name, birthdate)
         return self._map_to_domain(user)
 
     async def save_user(self, user: User):
@@ -112,7 +115,8 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
         return User(
             id=user_orm.id,
             name=user_orm.name,
-            age=user_orm.age,
+            birthdate=user_orm.birthdate,
+            gender=user_orm.gender,
             is_admin=user_orm.is_admin,
             status=user_orm.status,
             # has_requested_access=user_orm.has_requested_access,

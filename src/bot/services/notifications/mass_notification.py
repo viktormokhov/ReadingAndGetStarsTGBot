@@ -1,7 +1,7 @@
 import asyncio
 from telegram import Bot
-from src.bot import TOKEN
-from src.bot import session, user_ops
+from bot import TOKEN
+from bot import session, user_ops
 
 bot = Bot(token=TOKEN)
 

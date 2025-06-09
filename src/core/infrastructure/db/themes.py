@@ -1,6 +1,6 @@
 from sqlalchemy import select
 
-from src.core.infrastructure.database.models import ThemeStat, UserCards, ThemeSetting
+from core.infrastructure.db.models import ThemeStat, UserCards, ThemeSetting
 
 
 async def inc_theme(uid: int, theme: str):

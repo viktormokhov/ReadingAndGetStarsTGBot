@@ -3,10 +3,10 @@ from aiogram.types import CallbackQuery
 from aiogram.utils.markdown import hbold
 from fastapi import Depends
 
-from src.core.application.security.admin_only import admin_only
-from src.bot.handlers.ui.ui_admin import admin_back_menu_kb
-from src.core.application.services.admin.admin_stats import get_general_stats
-from src.core.infrastructure.database.repository_factory import RepositoryFactory
+from core.application.security.admin_only import admin_only
+from bot.handlers.ui.ui_admin import admin_back_menu_kb
+from core.application.services.admin.admin_stats import get_general_stats
+from core.infrastructure.db.repository_factory import RepositoryFactory
 
 router = Router()
 

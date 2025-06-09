@@ -3,9 +3,9 @@ import logging
 from aiogram.types import CallbackQuery
 from pydantic import ValidationError
 
-from src.core.infrastructure import save_card, is_card_duplicate
-from src.core.infrastructure import get_user_age
-from src.core.infrastructure import AsyncSessionLocal
+from core.infrastructure import save_card, is_card_duplicate
+from core.infrastructure import get_user_age
+from core.infrastructure import AsyncSessionLocal
 
 
 async def replace_placeholder_with_media(call: CallbackQuery, msg_id: int, url: str, logger: logging.Logger) -> bool:

@@ -1,8 +1,8 @@
-from src.core.infrastructure.clients.ai.clodflare import get_cloudflare_worker_image_response
-from src.core.infrastructure.clients.ai.gemini import get_google_gemini_text_response
-from src.core.infrastructure.clients.ai.gpt import get_openai_gpt_text_response, get_openai_dalle_image_response
-from src.core.infrastructure.clients.ai.openrouter import get_openrouter_deepseek_text_response
-from src.core.infrastructure.clients.ai.utils.normalize_and_validate import (
+from core.infrastructure.clients.ai.clodflare import get_cloudflare_worker_image_response
+from core.infrastructure.clients.ai.gemini import get_google_gemini_text_response
+from core.infrastructure.clients.ai.gpt import get_openai_gpt_text_response, get_openai_dalle_image_response
+from core.infrastructure.clients.ai.openrouter import get_openrouter_deepseek_text_response
+from core.infrastructure.clients.ai.utils.normalize_and_validate import (
     normalize_llm_chatgpt_response,
     normalize_llm_gemini_response
 )

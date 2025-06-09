@@ -3,8 +3,8 @@ import os
 from aiogram import Router, F
 from aiogram.types import CallbackQuery
 
-from src.core.application.security.admin_only import admin_only
-from src.core.infrastructure.clients.redis_client import rc as redis_client
+from core.application.security.admin_only import admin_only
+from core.infrastructure.clients.redis_client import rc as redis_client
 
 router = Router()
 

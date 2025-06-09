@@ -4,7 +4,7 @@ from typing import Any
 
 import psutil
 
-from src.core.application.interfaces.health_providers import SystemStatusChecker
+from core.application.interfaces.health_providers import SystemStatusChecker
 
 START_TIME: float = time.time()
 

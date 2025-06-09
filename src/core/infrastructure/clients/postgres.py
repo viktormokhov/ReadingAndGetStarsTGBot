@@ -3,8 +3,9 @@ import logging
 import asyncpg
 
 from config.settings import get_db_settings, DBSettings
-from core.infrastructure.database.connection import sqlalchemy_engine
-from core.infrastructure.database.models import Base
+from core.infrastructure.db.connection import sqlalchemy_engine
+from core.infrastructure.db.migration_check import check_migrations
+from core.infrastructure.db.models import Base
 from core.infrastructure.initialization.init_admin import init_admin_flags
 
 logger = logging.getLogger(__name__)
@@ -28,7 +29,7 @@ async def create_database_if_not_exists(db_settings: DBSettings):
             logging.info(f"🟡 Database '{db_name}' already exists. Creation skipped.")
         await conn.close()
     except Exception as e:
-        logging.error(f"❌ Failed to create database '{db_name}': {e}")
+        logging.error(f"❌ Failed to create db '{db_name}': {e}")
         raise
 
 
@@ -46,6 +47,9 @@ async def init_db():
         raise
 
     try:
+        # Проверка миграций Alembic
+        check_migrations()
+
         await init_admin_flags()
     except Exception as e:
         logger.error("❌ Failed to initialize administrators", exc_info=e)

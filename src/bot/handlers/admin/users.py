@@ -5,15 +5,15 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from fastapi import Depends
 from sqlalchemy import delete
 
-from src.config.constants import PAGE_SIZE
-from src.core.infrastructure.database import user_ops
-from src.core.infrastructure.database.models import User
-from src.core.application.security.admin_only import admin_only
-from src.core.domain.models.pagination import PageParams
-from src.core.application.services.admin.admin_stats import render_user_stats
-from src.core.domain.services.admin.admin_user_service import fetch_user_stats
-from src.bot.handlers.ui.ui_admin import admin_pagination_kb, admin_back_menu_kb
-from src.core.infrastructure.database.repository_factory import RepositoryFactory
+from config.constants import PAGE_SIZE
+from core.infrastructure.db import user_ops
+from core.infrastructure.db.models import User
+from core.application.security.admin_only import admin_only
+from core.domain.models.pagination import PageParams
+from core.application.services.admin.admin_stats import render_user_stats
+from core.domain.services.admin.admin_user_service import fetch_user_stats
+from bot.handlers.ui.ui_admin import admin_pagination_kb, admin_back_menu_kb
+from core.infrastructure.db.repository_factory import RepositoryFactory
 
 router = Router()
 
@@ -47,7 +47,7 @@ async def show_all_users(call: CallbackQuery, is_admin: bool, user_repo = Depend
 @router.callback_query(F.data.startswith("reset_user:"))
 @admin_only()
 async def reset_user(call: CallbackQuery, is_admin: bool, user_repo = Depends(user_repo_dep)):
-    from src.core.infrastructure.database.models import UserStars
+    from core.infrastructure.db.models import UserStars
 
     user_id = int(call.data.split(":", 1)[1])
     user = await user_repo.get_by_id(user_id)

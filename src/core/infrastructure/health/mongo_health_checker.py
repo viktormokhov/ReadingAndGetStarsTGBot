@@ -1,6 +1,6 @@
 from typing import Any
 
-from src.core.application.interfaces.health_providers import MongoHealthChecker
+from core.application.interfaces.health_providers import MongoHealthChecker
 
 
 class DefaultMongoHealthChecker(MongoHealthChecker):

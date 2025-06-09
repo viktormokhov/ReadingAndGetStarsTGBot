@@ -1,6 +1,6 @@
 from redis.asyncio import Redis
 
-from src.config.constants import ACTIVE_QUESTION_KEY, BLOCK_MSG_KEY
+from config.constants import ACTIVE_QUESTION_KEY, BLOCK_MSG_KEY
 
 GENERATING_FLAG = "users:{user_id}:is_generating_{kind}"  # kind: card, text, image, ...
 

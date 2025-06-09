@@ -1,6 +1,6 @@
 from openai import AsyncOpenAI
 
-from src.config.settings import get_deepseek_settings
+from config.settings import get_deepseek_settings
 
 ai_settings = get_deepseek_settings()
 

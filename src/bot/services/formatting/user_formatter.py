@@ -1,4 +1,4 @@
-from src.core.domain.services.users.user_progress import get_status_by_stars
+from core.domain.services.users.user_progress import get_status_by_stars
 
 
 def format_stats(data: dict) -> str:

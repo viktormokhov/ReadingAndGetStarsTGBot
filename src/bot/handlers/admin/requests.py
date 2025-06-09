@@ -2,11 +2,11 @@ from aiogram import Router, F
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from src.config.settings import get_tg_settings
-from src.core.application.security.admin_only import admin_only
-from src.bot.handlers.ui.ui_main import main_menu_inline_kb
-from src.bot.handlers.ui.ui_admin import admin_back_menu_kb
-from src.core.infrastructure.database.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
+from config.settings import get_tg_settings
+from core.application.security.admin_only import admin_only
+from bot.handlers.ui.ui_main import main_menu_inline_kb
+from bot.handlers.ui.ui_admin import admin_back_menu_kb
+from core.infrastructure.db.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
 
 router = Router()
 

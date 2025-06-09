@@ -2,7 +2,7 @@ import base64
 
 from aiogram.client.session import aiohttp
 
-from src.config.settings import get_imgbb_settings
+from config.settings import get_imgbb_settings
 
 imgbb_settings = get_imgbb_settings()
 

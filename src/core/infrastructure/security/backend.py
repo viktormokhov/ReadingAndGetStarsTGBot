@@ -5,7 +5,7 @@ from starlette.authentication import (
 )
 from starlette.requests import HTTPConnection
 
-from src.config.settings import get_backend_settings
+from config.settings import get_backend_settings
 
 backend_settings = get_backend_settings()
 

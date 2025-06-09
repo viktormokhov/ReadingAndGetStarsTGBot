@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional, Literal
 
 from pydantic import BaseModel
@@ -8,7 +8,8 @@ from pydantic import BaseModel
 class User(BaseModel):
     id: int
     name: str
-    age: Optional[int] = None
+    birthdate: date
+    gender: str
     # is_approved: bool
     # has_requested_access: Optional[bool] = None
     is_admin: Optional[bool] = None
@@ -40,12 +41,14 @@ class RegistrationRequest(BaseModel):
     telegram_id: int
     name: str
     birth_date: str  # YYYY-MM-DD format
+    gender: str
     avatar: str
     init_data: Optional[str] = None
 
 class UserResponse(BaseModel):
     name: str
-    age: int
+    birthdate: date
+    gender: str
     stars: int = 0
     total_questions: int = 0
     card_count: int = 0

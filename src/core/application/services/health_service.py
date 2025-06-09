@@ -1,4 +1,4 @@
-from src.core.application.interfaces.health_providers import (
+from core.application.interfaces.health_providers import (
     MongoHealthChecker, RedisHealthChecker, DBHealthChecker, SystemStatusChecker
 )
 

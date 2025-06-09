@@ -137,6 +137,14 @@ class DBSettings(ProjectBaseSettings):
         )
 
     @property
+    def db_url_sync(self) -> str:
+        password = quote_plus(self.postgres_password.get_secret_value())
+        return (
+            f"postgresql://{self.postgres_user}:{password}@"
+            f"{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
+        )
+
+    @property
     def secret(self) -> str:
         return self.postgres_password.get_secret_value()
 
