@@ -1,7 +1,6 @@
 from typing import Any
 
 from core.application.interfaces.health_providers import RedisHealthChecker
-from core.infrastructure.clients.redis_client import rc
 
 
 class DefaultRedisHealthChecker(RedisHealthChecker):
@@ -10,23 +9,25 @@ class DefaultRedisHealthChecker(RedisHealthChecker):
 
     Выполняет пинг, собирает основную информацию о сервере и считает ключи с заданным префиксом.
     """
+    def __init__(self, redis_client):
+        self.redis = redis_client
 
     async def check(self) -> dict[str, Any]:
-        pong: bool = await rc.ping()
+        pong: bool = await self.redis.ping()
         if not pong:
             raise Exception("Redis is not responding")
 
-        info: dict[str, Any] = await rc.info()
+        info: dict[str, Any] = await self.redis.info()
         connected_clients: int = int(info.get("connected_clients", 0))
         version: str | None = info.get("redis_version")
         uptime: int = int(info.get("uptime_in_seconds", 0))
         used_memory: int = int(info.get("used_memory", 0))
         used_memory_mb: float = round(used_memory / (1024 * 1024), 2)
-        total_keys: int = await self.count_keys_with_prefix(rc, prefix="user")
+        total_keys: int = await self.count_keys_with_prefix(self.redis, prefix="user")
 
         # Оптимизация: получение host/port напрямую из connection_kwargs (это словарь, а не объект)
-        host: Any = rc.connection_pool.connection_kwargs.get("host", None)
-        port: Any = rc.connection_pool.connection_kwargs.get("port", None)
+        host: Any = self.redis.connection_pool.connection_kwargs.get("host", None)
+        port: Any = self.redis.connection_pool.connection_kwargs.get("port", None)
 
         return {
             "redis": "OK",

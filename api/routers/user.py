@@ -114,23 +114,3 @@ async def register_user(
 #         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.get("/user-profile/{user_id}", response_model=UserProfileResponse)
-async def get_user_profile(user_id: int):
-    """Получение профиля пользователя"""
-    try:
-        async with SQLAlchemyUserRepository() as repo:
-            user_data = await repo.get_by_id(user_id)
-
-        if not user_data:
-            raise HTTPException(
-                status_code=404,
-                detail=f"User with ID {user_id} not found"
-            )
-        return UserProfileResponse(success=True, data=user_data)
-
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"Ошибка получения профиля пользователя: {e}")
-        raise HTTPException(status_code=500, detail=str(e))

@@ -12,7 +12,7 @@ ENV_FILE = BASE_DIR / ".env"
 
 load_dotenv(dotenv_path=ENV_FILE)
 
-WEBAPP_URL = "https://v0-quiz-dx.vercel.app"
+WEBAPP_URL = "https://read-q.cloudns.ch:8443"
 
 
 class ProjectBaseSettings(BaseSettings):
@@ -139,6 +139,7 @@ class DBSettings(ProjectBaseSettings):
     @property
     def secret(self) -> str:
         return self.postgres_password.get_secret_value()
+
     mongo_initdb_root_username: str
     mongo_initdb_root_password: SecretStr
     mongodb_host: str
@@ -158,6 +159,23 @@ class DBSettings(ProjectBaseSettings):
     def mongodb_secret(self) -> str:
         return self.mongo_initdb_root_password.get_secret_value()
 
+    # ---- REDIS SETTINGS ----
+    redis_host: str
+    redis_port: int
+    redis_db: int = 0
+    redis_password: SecretStr
+
+    @property
+    def redis_url(self) -> str:
+        password = quote_plus(self.redis_password.get_secret_value())
+        return (
+            f"redis://:{password}@{self.redis_host}:{self.redis_port}/{self.redis_db}"
+        )
+
+    @property
+    def redis_secret(self) -> str | None:
+        return self.redis_password.get_secret_value()
+
 
 class ImgBBSettings(ProjectBaseSettings):
     imgbb_api_key: SecretStr
@@ -170,6 +188,25 @@ class BackendSettings(ProjectBaseSettings):
     def api_key(self) -> str:
         return self.backend_api_key.get_secret_value()
 
+
+class MinioSettings(ProjectBaseSettings):
+    minio_root_user: str
+    minio_root_password: SecretStr
+    minio_host: str
+    minio_port: int = 9000
+    minio_secure: bool = True
+
+    @property
+    def endpoint_url(self) -> str:
+        return f"{self.minio_host}:{self.minio_port}"
+
+    @property
+    def access_key(self) -> str:
+        return self.minio_root_user
+
+    @property
+    def secret_key(self) -> str:
+        return self.minio_root_password.get_secret_value()
 
 # === Инициализация ===
 def get_tg_settings():
@@ -211,3 +248,7 @@ def get_imgbb_settings():
 
 def get_backend_settings():
     return BackendSettings()
+
+def get_minio_settings():
+    return MinioSettings()
+

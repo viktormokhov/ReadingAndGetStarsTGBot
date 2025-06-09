@@ -58,11 +58,12 @@ async def health_mongo(request: Request, service: HealthService = Depends(get_he
             summary="Redis",
             response_model=RedisHealthResponse,
             response_description="Статус Redis")
-async def health_redis(service: HealthService = Depends(get_health_service)) -> JSONResponse:
+async def health_redis(request: Request, service: HealthService = Depends(get_health_service)) -> JSONResponse:
     """
     Проверка доступности Redis.
     """
     try:
+        redis_client = request.app.state.redis
         result: dict[str, Any] = await service.redis_health()
         return JSONResponse(status_code=status.HTTP_200_OK, content=result)
     except Exception as e:

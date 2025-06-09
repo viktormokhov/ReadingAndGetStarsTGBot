@@ -9,19 +9,32 @@ from core.domain.models.telegram import TelegramWebhook
 from core.domain.models.user import ModerationRequest
 from core.infrastructure.telegram.telegram_client import TelegramClient, get_tg_client
 from core.presentation.deps import verify_webhook_api_key
+from core.presentation.telegram.schemas.telegram_schema import TelegramValidationResponse, TelegramValidationRequest
 
 router = APIRouter(
     prefix="/api/v1/telegram",
     tags=["telegram"],
-    dependencies=[Depends(verify_webhook_api_key)],
+    # dependencies=[Depends(verify_webhook_api_key)],
     responses={404: {"description": "Not found"}},
 )
 
 
-@router.post("/telegram-webhook")
+@router.post("/validate", response_model=TelegramValidationResponse)
+async def validate_telegram_data(request: TelegramValidationRequest,
+                                 tg_client: TelegramClient = Depends(get_tg_client),):
+    """Валидация данных Telegram WebApp"""
+    is_valid = await tg_client.validate_webapp_data(request.initData)
+
+    if not is_valid:
+        raise HTTPException(status_code=401, detail="Invalid Telegram data")
+
+    return TelegramValidationResponse(success=True, valid=True)
+
+
+@router.post("/telegram-webhook", dependencies=[Depends(verify_webhook_api_key)])
 async def telegram_webhook(webhook: TelegramWebhook,
                            background_tasks: BackgroundTasks,
-                           tg_client: TelegramClient = Depends(get_tg_client)):
+                           tg_client: TelegramClient = Depends(get_tg_client),):
     """Обработка webhook от Telegram"""
     user_id = webhook.message["chat"]["id"]
 

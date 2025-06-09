@@ -31,6 +31,11 @@ class TelegramUser(BaseModel):
     is_premium: Optional[bool] = False
     photo_url: Optional[str] = None
 
+
+class UserBase(BaseModel):
+    pass
+
+
 class RegistrationRequest(BaseModel):
     telegram_id: int
     name: str
@@ -39,14 +44,13 @@ class RegistrationRequest(BaseModel):
     init_data: Optional[str] = None
 
 class UserResponse(BaseModel):
-    id: int
     name: str
     age: int
     stars: int = 0
     total_questions: int = 0
     card_count: int = 0
     is_admin: bool = False
-    avatar: str
+    avatar: Optional[str] = None
     status: Literal["pending", "approved", "rejected"] = "pending"
     telegram_id: int
     first_active: Optional[datetime] = None
@@ -55,7 +59,6 @@ class UserResponse(BaseModel):
 class UserProfileResponse(BaseModel):
     success: bool
     data: UserResponse
-
 
 class ModerationRequest(BaseModel):
     user_id: int

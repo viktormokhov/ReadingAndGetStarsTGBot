@@ -1,25 +1,24 @@
+import redis.asyncio as redis
 import logging
 
-import redis.asyncio as redis
+async def init_redis(app, redis_settings):
+    """
+    Инициализация Redis клиента и проверка соединения.
+    """
+    redis_url = redis_settings.redis_url
+    redis_client = redis.from_url(redis_url, encoding="utf-8", decode_responses=True)
+    app.state.redis = redis_client
 
-logger = logging.getLogger(__name__)
-
-rc = redis.Redis(
-    host='127.0.0.1',
-    port=6379,
-    decode_responses=True
-)
-
-
-async def init_redis():
-    """Проверяет соединение с Redis."""
     try:
-        pong = await rc.ping()
+        pong = await redis_client.ping()
         if pong:
-            logger.info("✅ Redis connected successfully")
+            logging.info("✅ Redis connection established")
         else:
-            logger.error("❌ Redis ping failed — no response")
-    except Exception as e:
-        logger.error("❌ Redis connection failed", exc_info=e)
+            logging.error("❌ Redis ping failed")
+            raise Exception("Redis ping failed")
+    except Exception as err:
+        logging.error(f"❌ Redis error: {err}")
+        raise
+    return redis_client
 
 

@@ -1,5 +1,9 @@
+import hashlib
+import hmac
 import logging
+import time
 from typing import Optional, Any
+from urllib.parse import parse_qsl
 
 import aiohttp
 from fastapi import Request
@@ -24,6 +28,7 @@ class TelegramClient:
     """
 
     def __init__(self, bot_token: str, session: aiohttp.ClientSession):
+        self.bot_token: str = bot_token
         self.base_url: str = f"https://api.telegram.org/bot{bot_token}"
         self.session: aiohttp.ClientSession = session
 
@@ -140,6 +145,50 @@ class TelegramClient:
         if reply_markup:
             payload["reply_markup"] = reply_markup
         return await self._request("editMessageText", payload)
+
+    async def validate_webapp_data(self, init_data: str) -> bool:
+        """Валидация данных Telegram WebApp"""
+        try:
+            # Парсим данные
+            parsed_data = dict(parse_qsl(init_data))
+            hash_value = parsed_data.pop('hash', None)
+
+            if not hash_value:
+                return False
+
+            # Создаем строку для проверки
+            data_check_string = '\n'.join([f"{k}={v}" for k, v in sorted(parsed_data.items())])
+
+            # Создаем секретный ключ
+            secret_key = hmac.new(
+                "WebAppData".encode(),
+                self.bot_token.encode(),
+                hashlib.sha256
+            ).digest()
+
+            # Вычисляем hash
+            calculated_hash = hmac.new(
+                secret_key,
+                data_check_string.encode(),
+                hashlib.sha256
+            ).hexdigest()
+
+            # Проверяем hash
+            if calculated_hash != hash_value:
+                return False
+
+            # Проверяем время (не старше 24 часов)
+            auth_date = int(parsed_data.get('auth_date', 0))
+            current_time = int(time.time())
+
+            if current_time - auth_date > 86400:  # 24 часа
+                return False
+
+            return True
+
+        except Exception as e:
+            logger.error(f"Ошибка валидации Telegram данных: {e}")
+            return False
 
 
 async def ensure_webhook(
