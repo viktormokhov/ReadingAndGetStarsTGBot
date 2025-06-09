@@ -5,10 +5,10 @@ description = ""
 readme = "README.md"
 authors = ["anldstr666 <vv.mokhov@gmail.com>"]
 packages = [
-    { include = "core" },
-    { include = "api" },
-    { include = "bot" },
-    { include = "config" }
+  { include = "api" },
+  { include = "bot" },
+  { include = "config" },
+  { include = "core" },
 ]
 
 [tool.poetry.dependencies]
