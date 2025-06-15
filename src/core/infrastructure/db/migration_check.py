@@ -25,7 +25,8 @@ def _parse_revision_lines(output):
 def check_migrations():
     """Check if all alembic migrations are applied (sync version)."""
     try:
-        project_root = Path(__file__).resolve().parent.parent.parent.parent.parent
+        # Получаем текущую папку, где лежит скрипт и alembic
+        alembic_dir = Path(__file__).resolve().parent
 
         # Проверяем наличие alembic
         res = subprocess.run(["alembic", "--version"], capture_output=True, text=True)
@@ -35,7 +36,7 @@ def check_migrations():
         # Получаем текущие применённые ревизии
         current = subprocess.run(
             ["alembic", "current"],
-            cwd=project_root,
+            cwd=alembic_dir,
             capture_output=True,
             text=True,
         )
@@ -45,7 +46,7 @@ def check_migrations():
         # Получаем актуальные head ревизии
         heads = subprocess.run(
             ["alembic", "heads"],
-            cwd=project_root,
+            cwd=alembic_dir,
             capture_output=True,
             text=True,
         )

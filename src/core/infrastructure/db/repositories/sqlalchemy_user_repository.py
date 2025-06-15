@@ -42,12 +42,18 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
             return None
         return self._map_to_domain(user)
 
-    async def create(self, uid: int, name: str = None, birthdate: date = None, is_admin: bool = False, status: str = 'pending') -> User:
+    async def create(self,
+                     uid: int,
+                     name: str = None,
+                     gender: str = None,
+                     birthdate: date = None,
+                     is_admin: bool = False,
+                     status: str = 'pending') -> User:
         """Создаёт нового пользователя с указанным Telegram ID."""
         if birthdate is None:
             # Default birthdate if none provided (January 1, 2000)
             birthdate = date(2000, 1, 1)
-        user = UserORM(telegram_id=uid, name=name, birthdate=birthdate, is_admin=is_admin, status=status)
+        user = UserORM(telegram_id=uid, name=name, gender=gender, birthdate=birthdate, is_admin=is_admin, status=status)
         self.session.add(user)
         await self.session.flush()
         return self._map_to_domain(user)
