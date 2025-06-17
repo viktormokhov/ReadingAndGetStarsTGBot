@@ -5,7 +5,7 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.application.interfaces.repositories.user_repository import UserRepositoryInterface
-from core.domain.models.user import User
+from core.domain.models.user import User, Gender
 from core.infrastructure.db.connection import AsyncSessionLocal
 from core.infrastructure.db.models import User as UserORM, ThemeStat, UserCards, UserStars, TextGeneration
 
@@ -45,23 +45,23 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
     async def create(self,
                      uid: int,
                      name: str = None,
-                     gender: str = None,
-                     birthdate: date = None,
+                     gender: Gender = None,
+                     birth_date: date = None,
                      is_admin: bool = False,
                      status: str = 'pending') -> User:
         """Создаёт нового пользователя с указанным Telegram ID."""
-        if birthdate is None:
+        if birth_date is None:
             # Default birthdate if none provided (January 1, 2000)
-            birthdate = date(2000, 1, 1)
-        user = UserORM(telegram_id=uid, name=name, gender=gender, birthdate=birthdate, is_admin=is_admin, status=status)
+            birth_date = date(2000, 1, 1)
+        user = UserORM(telegram_id=uid, name=name, gender=gender, birth_date=birth_date, is_admin=is_admin, status=status)
         self.session.add(user)
         await self.session.flush()
         return self._map_to_domain(user)
 
-    async def get_or_create(self, uid: int, name: str | None = None, birthdate: date = None) -> Optional[User]:
+    async def get_or_create(self, uid: int, name: str | None = None, birth_date: date = None) -> Optional[User]:
         user = await self.session.get(UserORM, uid)
         if not user:
-            user = await self.create(uid, name, birthdate)
+            user = await self.create(uid, name, birth_date)
         return self._map_to_domain(user)
 
     async def save_user(self, user: User):
@@ -121,7 +121,7 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
         return User(
             id=user_orm.id,
             name=user_orm.name,
-            birthdate=user_orm.birthdate,
+            birth_date=user_orm.birth_date,
             gender=user_orm.gender,
             is_admin=user_orm.is_admin,
             status=user_orm.status,
@@ -132,5 +132,6 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
             # last=user_orm.last,
             telegram_id=user_orm.telegram_id,
             first_active=user_orm.first_active,
-            last_active=user_orm.last_active
+            last_active=user_orm.last_active,
+            registered_at=user_orm.registered_at
         )

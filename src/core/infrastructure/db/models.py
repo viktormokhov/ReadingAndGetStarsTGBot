@@ -1,8 +1,10 @@
 from datetime import datetime, UTC, date
 from typing import Optional
 
-from sqlalchemy import Date, Boolean, JSON, Text
+from sqlalchemy import Date, Boolean, JSON, Text, BigInteger, Enum
 from sqlalchemy import ForeignKey, UniqueConstraint, String, Integer, Column, DateTime, func
+
+from core.domain.models.user import Gender
 from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
 
 
@@ -54,8 +56,8 @@ class User(Base):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str | None]
-    birthdate: Mapped[date] = mapped_column(Date, nullable=False)
-    gender: Mapped[str] = mapped_column(String, nullable=False)
+    birth_date: Mapped[date] = mapped_column(Date, nullable=False)
+    gender: Mapped[Gender] = mapped_column(Enum(Gender), nullable=False)
     # is_approved: Mapped[bool] = mapped_column(default=False)
     # has_requested_access = Column(Boolean, default=False)
     is_admin: Mapped[bool] = mapped_column(default=False)
@@ -68,9 +70,10 @@ class User(Base):
     quizzes: Mapped[list["UserQuizzes"]] = relationship(back_populates="user", cascade="all,delete")
     stars: Mapped[list["UserStars"]] = relationship(back_populates="user", cascade="all,delete")
     status: Mapped[str] = mapped_column(String, default="pending", nullable=False)
-    telegram_id: Mapped[int] = mapped_column(unique=True)
+    telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True, index=True)
     first_active = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
     last_active = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
+    registered_at = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
 
 
 class ThemeSetting(Base):

@@ -1,4 +1,4 @@
-import asyncio
+import uuid
 
 
 class AvatarService:
@@ -9,17 +9,20 @@ class AvatarService:
 
     async def generate_avatar_and_cache(self, prompt: str, user_id: int) -> tuple[str | None, str | None]:
         img_url = await self.image_generator.generate(prompt)
-        avatar_uuid = None
-        if img_url is not None:
-            avatar_uuid = await self.image_tools.compress_and_store_in_redis(img_url, user_id)
-        return img_url, avatar_uuid
+        if img_url is None:
+            return None, None
+
+        png_bytes = await self.image_tools.compress_to_png_bytes(img_url)
+        avatar_uuid = str(uuid.uuid4())
+        object_name = f"{user_id}/{avatar_uuid}.png"
+
+        await self.image_storage.save(png_bytes, object_name=object_name, ext="png")
+        avatar_url = self.image_storage.get_presigned_url(object_name)
+        return avatar_url, avatar_uuid
 
     async def confirm_and_store_avatar(self, user_id: int, avatar_uuid: str) -> str:
-        img_bytes = await self.image_tools.get_png_from_redis(user_id, avatar_uuid)
-        object_name = await self.image_storage.save(img_bytes, ext="png")
-        await self.image_tools.delete_png_from_redis(user_id, avatar_uuid)
-        avatar_url = self.image_storage.get_presigned_url(object_name, expires_minutes=60)
-        return avatar_url
+        object_name = f"{user_id}/{avatar_uuid}.png"
+        return self.image_storage.get_presigned_url(object_name)
 
     async def get_avatar_attempts(self, user_id: int) -> int:
         """Get the number of avatar generation attempts for a user."""

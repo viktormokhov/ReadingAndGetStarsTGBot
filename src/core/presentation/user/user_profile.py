@@ -11,7 +11,7 @@ from core.infrastructure.storage.minio_storage import MinioImageStorage
 from core.presentation.user.schemas.user_schema import GenerateAvatarResponse, GenerateAvatarRequest
 
 router = APIRouter(
-    prefix="/api/v1/users",
+    prefix="/api/v1/user",
     tags=["user"],
     # dependencies=[Depends(verify_api_key)],
     responses={404: {"description": "Not found"}},

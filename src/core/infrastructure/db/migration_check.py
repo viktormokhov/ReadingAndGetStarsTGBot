@@ -26,7 +26,7 @@ def check_migrations():
     """Check if all alembic migrations are applied (sync version)."""
     try:
         # Получаем текущую папку, где лежит скрипт и alembic
-        alembic_dir = Path(__file__).resolve().parent
+        alembic_dir = Path(__file__).resolve().parent / 'alembic'
 
         # Проверяем наличие alembic
         res = subprocess.run(["alembic", "--version"], capture_output=True, text=True)
@@ -59,7 +59,7 @@ def check_migrations():
 
         # Диагностика
         if not head_ids:
-            logger.warning("No migration heads found. Migrations might not be set up correctly.")
+            logger.warning("No migration heads found")
             return False
         if not current_ids:
             logger.error("No migrations have been applied yet. Please run 'alembic upgrade head'.")

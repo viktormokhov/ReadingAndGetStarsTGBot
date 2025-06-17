@@ -10,8 +10,7 @@ class MinioImageStorage:
         self.bucket = bucket_name
         self.url_prefix = url_prefix
 
-    async def save(self, image_bytes: bytes, ext: str = "png") -> str:
-        object_name = f"{uuid.uuid4().hex}.{ext}"
+    async def save(self, image_bytes: bytes, object_name: str, ext: str = "png") -> str:
         from asyncio import get_running_loop
         await get_running_loop().run_in_executor(
             None,
@@ -23,7 +22,6 @@ class MinioImageStorage:
                 content_type=f"image/{ext}",
             )
         )
-        # Возвращаем только имя объекта!
         return object_name
 
     def get_presigned_url(self, object_name: str, expires_minutes: int = 60) -> str:

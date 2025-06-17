@@ -80,17 +80,17 @@ class UserService:
 #     return user
 
 
-async def update_user_birthdate(user_id: int, birthdate: date):
+async def update_user_birth_date(user_id: int, birth_date: date):
     """
     Updates a user's birthdate in the database.
 
     Args:
         user_id (int): The user's ID.
-        birthdate (date): The user's birthdate.
+        birth_date (date): The user's birthdate.
     """
     async with AsyncSessionLocal.begin() as session:
         user = await session.get(User, user_id)
-        user.birthdate = birthdate
+        user.birth_date = birth_date
         await session.commit()
 
 async def update_user_age(user_id: int, age: int):
@@ -107,7 +107,7 @@ async def update_user_age(user_id: int, age: int):
     birth_year = current_year - age
     birthdate = date(birth_year, 1, 1)
 
-    await update_user_birthdate(user_id, birthdate)
+    await update_user_birth_date(user_id, birthdate)
 
 
 async def get_all_user_ids(session: AsyncSession) -> list[int]:

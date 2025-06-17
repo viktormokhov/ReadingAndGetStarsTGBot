@@ -1,6 +1,7 @@
 import logging
 
 from config.settings import get_tg_settings
+from core.domain.models.user import Gender
 from core.infrastructure.db.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
 
 logger = logging.getLogger(__name__)
@@ -16,7 +17,7 @@ async def init_admin_flags():
         admin_id = tg_settings.tg_admin_id
         user = await repo.get_by_id(admin_id)
         if user is None:
-            await repo.create(uid=admin_id, name="admin", gender='male', birthdate=None, is_admin=True, status='approved')
+            await repo.create(uid=admin_id, name="admin", gender=Gender.MALE, birthdate=None, is_admin=True, status='approved')
             logger.info(f"👤 Пользователь {admin_id} создан как admin")
         elif not user.is_admin:
             user.is_admin = True

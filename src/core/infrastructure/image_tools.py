@@ -7,31 +7,17 @@ class ImageTools:
     def __init__(self, redis_client):
         self.redis = redis_client
 
-    async def compress_to_png(self, url: str, size=(256, 256)) -> bytes:
+    async def compress_to_png_bytes(self, url: str, size=(256, 256)) -> bytes:
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
+                if resp.status != 200:
+                    raise Exception(f"Failed to fetch image: {resp.status}")
                 img_bytes = await resp.read()
-        image = Image.open(BytesIO(img_bytes))
-        image = image.convert("RGBA")
+        image = Image.open(BytesIO(img_bytes)).convert("RGBA")
         image = image.resize(size, Image.LANCZOS)
         output = BytesIO()
         image.save(output, format="PNG", optimize=True)
         return output.getvalue()
-
-    async def compress_and_store_in_redis(self, url: str, user_id: int) -> str:
-        png_bytes = await self.compress_to_png(url)
-        avatar_uuid = str(uuid.uuid4())
-        await self.redis.set(f"avatar:{user_id}:{avatar_uuid}", png_bytes, ex=3600)  # TTL 1 час
-        return avatar_uuid
-
-    async def get_png_from_redis(self, user_id: int, avatar_uuid: str) -> bytes:
-        data = await self.redis.get(f"avatar:{user_id}:{avatar_uuid}")
-        if data is None:
-            raise Exception("Аватар не найден или истек срок действия")
-        return data
-
-    async def delete_png_from_redis(self, user_id: int, avatar_uuid: str):
-        await self.redis.delete(f"avatar:{user_id}:{avatar_uuid}")
 
     async def increment_avatar_attempts(self, user_id: int) -> tuple[int, str]:
         """
